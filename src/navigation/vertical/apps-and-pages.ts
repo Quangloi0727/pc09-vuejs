@@ -100,6 +100,7 @@ export default [
     icon: { icon: 'tabler-door' },
     children: [
       { title: 'Thiết bị', to: 'apps-quanliphongthinghiem-thietbi' },
+      { title: 'Kho nguyên liệu', to: 'apps-quanliphongthinghiem-khonguyenlieu' },
     ],
   },
   {

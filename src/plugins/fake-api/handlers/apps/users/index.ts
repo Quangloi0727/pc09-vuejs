@@ -165,6 +165,61 @@ export const handlerAppsUsers = [
     );
   }),
 
+  http.get("/api/materials/find-all", async ({ request }) => {
+    const url = new URL(request.url);
+
+    const q = url.searchParams.get("q");
+    const role = url.searchParams.get("role");
+    const plan = url.searchParams.get("plan");
+    const status = url.searchParams.get("status");
+    const sortBy = url.searchParams.get("sortBy");
+    const itemsPerPage = url.searchParams.get("itemsPerPage");
+    const page = url.searchParams.get("page");
+    const orderBy = url.searchParams.get("orderBy");
+
+    const searchQuery = is.string(q) ? q : undefined;
+    const queryLower = (searchQuery ?? "").toString().toLowerCase();
+
+    const parsedSortBy = destr(sortBy);
+    const sortByLocal = is.string(parsedSortBy) ? parsedSortBy : "";
+
+    const parsedOrderBy = destr(orderBy);
+    const orderByLocal = is.string(parsedOrderBy) ? parsedOrderBy : "";
+
+    const parsedItemsPerPage = destr(itemsPerPage);
+    const parsedPage = destr(page);
+
+    const itemsPerPageLocal = is.number(parsedItemsPerPage)
+      ? parsedItemsPerPage
+      : 10;
+    const pageLocal = is.number(parsedPage) ? parsedPage : 1;
+
+    const apiUrl = `${baseUrl}/v1/materials/find-all?limit=1000&offset=0`;
+    let filteredUsers: any = [];
+
+    try {
+      filteredUsers = await axios.get(apiUrl);
+      filteredUsers = filteredUsers.data.data.list;
+    } catch (error) {
+      console.error("Lỗi khi lấy dữ liệu từ API:", error);
+    }
+
+    const totalUsers = filteredUsers.length;
+
+    // total pages
+    const totalPages = Math.ceil(totalUsers / itemsPerPageLocal);
+
+    return HttpResponse.json(
+      {
+        users: paginateArray(filteredUsers, itemsPerPageLocal, pageLocal),
+        totalPages,
+        totalUsers,
+        page: pageLocal > Math.ceil(totalUsers / itemsPerPageLocal) ? 1 : page,
+      },
+      { status: 200 }
+    );
+  }),
+
   // Get Single User Detail
   http.get<PathParams>("/api/apps/users/:id", ({ params }) => {
     const userId = Number(params.id);
@@ -223,6 +278,18 @@ export const handlerAppsUsers = [
 
     try {
       const response = await axios.post(`${baseUrl}/v1/devices`, data);
+      return HttpResponse.json({ body: response.data }, { status: 201 });
+    } catch (error) {
+      console.error('Error:', error);
+    }
+
+  }),
+
+  http.post("/api/apps/materials", async ({ request }) => {
+    const data = (await request.json()) as any;
+
+    try {
+      const response = await axios.post(`${baseUrl}/v1/materials`, data);
       return HttpResponse.json({ body: response.data }, { status: 201 });
     } catch (error) {
       console.error('Error:', error);
