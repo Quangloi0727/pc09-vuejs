@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import AddNewUserDrawer from "@/views/apps/quanliphongthinghiem/thietbi/AddNewDevice.vue";
+import AddNewUserDrawer from "@/views/apps/quanliphongthinghiem/khonguyenmau/AddNewNguyenMau.vue";
 import type { UserProperties } from "@db/apps/users/types";
 import axios from 'axios';
 import { PerfectScrollbar } from 'vue3-perfect-scrollbar';
@@ -26,21 +26,21 @@ const updateOptions = (options: any) => {
 };
 
 const headersDevices = [
-  { title: "Tên thiết bị", key: "name" },
-  { title: "Mã số thiết bị", key: "code" },
-  { title: "Hãng sản xuất", key: "manufacturer" },
-  { title: "Model", key: "model" },
-  { title: "Số seri", key: "seri" },
-  { title: "Ngày đưa vào sử dụng", key: "datePutIntoUse" },
-  { title: "Tình trạng", key: "status" },
-  { title: "Lịch sử bảo dưỡng", key: "maintenanceHistory" },
-  { title: "Thông tin bảo hành", key: "warrantyInformation" },
+  { title: "Tên mẫu", key: "name" },
+  { title: "Mã số  mẫu", key: "code" },
+  { title: "Giới tính", key: "sex" },
+  { title: "Tuổi", key: "age" },
+  { title: "Thông tin y tế khác	", key: "other" },
+  { title: "Nguồn gốc của mẫu", key: "originOfSample" },
+  { title: "Phương pháp thu thập", key: "CollectionMethod" },
+  { title: "Thời gian thu thập", key: "time" },
+  { title: "Địa điểm thu thập", key: "address" },
   { title: "Actions", key: "actions", sortable: false },
 ];
 
 // 👉 Fetching device
 const { data: deviceData, execute: fetchDevice } = await useApi<any>(
-  createUrl("/devices/find-all", {
+  createUrl("/sampleWarehouses/find-all", {
     query: {
       q: searchQuery,
       status: selectedStatus,
@@ -65,16 +65,16 @@ let deviceDetail: any = {};
 const refForm = ref<VForm>()
 let name = ref('')
 let code = ref('')
-let manufacturer = ref('')
-let model = ref('')
-let seri = ref()
-let datePutIntoUse = ref('')
-let maintenanceHistory = ref('')
-let warrantyInformation = ref('')
-
+let sex = ref('')
+let age = ref('')
+let other = ref()
+let originOfSample = ref('')
+let CollectionMethod = ref('')
+let time = ref('')
+let address = ref('')
 // 👉 Add new user
 const addNewUser = async (userData: UserProperties) => {
-  await $api("/apps/devices", {
+  await $api("/apps/sampleWarehouses", {
     method: "POST",
     body: userData,
   });
@@ -85,7 +85,7 @@ const addNewUser = async (userData: UserProperties) => {
 
 // 👉 Delete user
 const deleteUser = async (id: number) => {
-  await axios.delete(`${baseUrl}/v1/devices/${id}`);
+  await axios.delete(`${baseUrl}/v1/sampleWarehouses/${id}`);
   // refetch User
   // TODO: Make this async
   fetchDevice();
@@ -93,16 +93,18 @@ const deleteUser = async (id: number) => {
 
 
 const getDeviceDetail = async (id: number) => {
-  const response = await axios.get(`${baseUrl}/v1/devices/${id}`);
+  const response = await axios.get(`${baseUrl}/v1/sampleWarehouses/${id}`);
   deviceDetail = { ...response.data.data };
   name = ref(deviceDetail.name)
   code = ref(deviceDetail.code)
-  manufacturer = ref(deviceDetail.manufacturer)
-  model = ref(deviceDetail.model)
-  seri = ref(deviceDetail.seri)
-  datePutIntoUse = ref(deviceDetail.datePutIntoUse)
-  maintenanceHistory = ref(deviceDetail.maintenanceHistory)
-  warrantyInformation = ref(deviceDetail.warrantyInformation)
+  sex = ref(deviceDetail.sex)
+  age = ref(deviceDetail.age)
+  other = ref(deviceDetail.other)
+  originOfSample = ref(deviceDetail.originOfSample)
+  CollectionMethod = ref(deviceDetail.CollectionMethod)
+  time = ref(deviceDetail.time)
+  address = ref(deviceDetail.address)
+
 };
 
 const editDevice = (id: number) => {
@@ -119,14 +121,15 @@ const onSubmit = () => {
     if (valid) {
       const data = {
         name: name.value,
-        model: model.value,
-        seri: seri.value,
-        manufacturer: manufacturer.value,
-        datePutIntoUse: datePutIntoUse.value,
-        maintenanceHistory: maintenanceHistory.value,
-        warrantyInformation: warrantyInformation.value,
+        sex: sex.value,
+        age: age.value,
+        other: other.value,
+        originOfSample: originOfSample.value,
+        CollectionMethod: CollectionMethod.value,
+        time: time.value,
+        address: address.value,
       }
-      await axios.put(`${baseUrl}/v1/devices/${deviceDetail.id}`, data);
+      await axios.put(`${baseUrl}/v1/sampleWarehouses/${deviceDetail.id}`, data);
       await fetchDevice();
       closeNavigationDrawer();
     }
@@ -140,7 +143,7 @@ const onSubmit = () => {
 
     <VCard class="mb-6">
       <VCardItem class="pb-4">
-        <VCardTitle>Danh sách thiết bị</VCardTitle>
+        <VCardTitle>Danh sách mẫu</VCardTitle>
       </VCardItem>
 
       <VCardText class="d-flex flex-wrap gap-4">
@@ -168,7 +171,7 @@ const onSubmit = () => {
 
           <!-- 👉 Add user button -->
           <VBtn prepend-icon="tabler-plus" @click="isAddNewUserDrawerVisible = true">
-            Thêm mới thiết bị
+            Thêm mới mẫu
           </VBtn>
         </div>
       </VCardText>
@@ -196,45 +199,39 @@ const onSubmit = () => {
         </template>
 
         <!-- Status -->
-        <template #item.manufacturer="{ item }">
+        <template #item.sex="{ item }">
           <div class="text-body-1 text-high-emphasis text-capitalize">
-            {{ item.manufacturer }}
+            {{ item.sex }}
           </div>
         </template>
 
-        <template #item.model="{ item }">
+        <template #item.age="{ item }">
           <div class="text-body-1 text-high-emphasis text-capitalize">
-            {{ item.model }}
+            {{ item.age }}
           </div>
         </template>
 
-        <template #item.seri="{ item }">
+        <template #item.other="{ item }">
           <div class="text-body-1 text-high-emphasis text-capitalize">
-            {{ item.seri }}
+            {{ item.other }}
           </div>
         </template>
 
-        <template #item.datePutIntoUse="{ item }">
+        <template #item.originOfSample="{ item }">
           <div class="text-body-1 text-high-emphasis text-capitalize">
-            {{ item.datePutIntoUse }}
+            {{ item.originOfSample }}
           </div>
         </template>
 
-        <template #item.status="{ item }">
+        <template #item.CollectionMethod="{ item }">
           <div class="text-body-1 text-high-emphasis text-capitalize">
-            Bảo dưỡng
+            {{ item.CollectionMethod }}
           </div>
         </template>
 
-        <template #item.maintenanceHistory="{ item }">
+        <template #item.time="{ item }">
           <div class="text-body-1 text-high-emphasis text-capitalize">
-            {{ item.maintenanceHistory }}
-          </div>
-        </template>
-
-        <template #item.warrantyInformation="{ item }">
-          <div class="text-body-1 text-high-emphasis text-capitalize">
-            {{ item.warrantyInformation }}
+            {{ item.time }}
           </div>
         </template>
 
@@ -283,7 +280,7 @@ const onSubmit = () => {
     <!-- Edit device -->
     <VNavigationDrawer temporary :width="400" location="end" class="scrollable-content" :model-value="isDrawerOpen">
       <!-- 👉 Title -->
-      <AppDrawerHeaderSection title="Chỉnh sửa thiết bị" @cancel="closeNavigationDrawer" />
+      <AppDrawerHeaderSection title="Chỉnh sửa kho mẫu" @cancel="closeNavigationDrawer" />
 
       <VDivider />
 
@@ -295,48 +292,49 @@ const onSubmit = () => {
               <VRow>
                 <!-- 👉 Full name -->
                 <VCol cols="12">
-                  <AppTextField v-model="name" :rules="[requiredValidator]" label="Tên thiết bị"
-                    placeholder="Tên thiết bị" />
+                  <AppTextField v-model="name" :rules="[requiredValidator]" label="Tên kho mẫu"
+                    placeholder="Tên kho mẫu" />
                 </VCol>
 
                 <!-- 👉 code -->
                 <VCol cols="12">
-                  <AppTextField v-model="code" :rules="[requiredValidator]" label="Mã thiết bị"
-                    placeholder="Mã thiết bị" />
+                  <AppTextField v-model="code" :rules="[requiredValidator]" label="Mã kho mẫu"
+                    placeholder="Mã kho mẫu" />
                 </VCol>
 
                 <!-- 👉 Email -->
                 <VCol cols="12">
-                  <AppTextField v-model="manufacturer" :rules="[requiredValidator]" label="Hãng sản xuất"
-                    placeholder="Hãng sản xuất" />
+                  <AppTextField v-model="sex" :rules="[requiredValidator]" label="Giới tính" placeholder="Giới tính" />
                 </VCol>
 
-                <!-- 👉 model -->
                 <VCol cols="12">
-                  <AppTextField v-model="model" :rules="[requiredValidator]" label="Model" placeholder="Model" />
+                  <AppTextField v-model="age" label="Tuổi" placeholder="Tuổi" :rules="[requiredValidator]" />
                 </VCol>
 
-                <!-- seri -->
                 <VCol cols="12">
-                  <AppTextField v-model="seri" label="Số seri" placeholder="Số seri" :rules="[requiredValidator]" />
+                  <AppTextField v-model="other" label="Thông tin khác" placeholder="Thông tin khác"
+                    :rules="[requiredValidator]" />
                 </VCol>
 
                 <!-- ngay dua vao su dung -->
                 <VCol cols="12">
-                  <AppDateTimePicker v-model="datePutIntoUse" label="Ngày đưa vào sử dụng"
-                    placeholder="Ngày đưa vào sử dụng" :rules="[requiredValidator]" />
+                  <AppTextField v-model="originOfSample" :rules="[requiredValidator]" label="Nguồn gốc của mẫu"
+                    placeholder="Nguồn gốc của mẫu" />
                 </VCol>
 
-                <!-- lich su bao duong -->
                 <VCol cols="12">
-                  <AppDateTimePicker v-model="maintenanceHistory" label="Lịch sử bảo dưỡng"
-                    placeholder="Lịch sử bảo dưỡng" :rules="[requiredValidator]" />
+                  <AppTextField v-model="CollectionMethod" label="Phương pháp thu thập"
+                    placeholder="Phương pháp thu thập" :rules="[requiredValidator]" />
                 </VCol>
 
-                <!-- thong tin bao hanh -->
                 <VCol cols="12">
-                  <AppTextField v-model="warrantyInformation" label="Thông tin bảo hành"
-                    placeholder="Thông tin bảo hành" :rules="[requiredValidator]" />
+                  <AppDateTimePicker v-model="time" label="Thời gian thu thập" placeholder="Thời gian thu thập"
+                    :rules="[requiredValidator]" />
+                </VCol>
+
+                <VCol cols="12">
+                  <AppTextField v-model="address" label="Địa điểm thu thập" placeholder="Địa điểm thu thập"
+                    :rules="[requiredValidator]" />
                 </VCol>
 
                 <!-- 👉 Submit and Cancel -->

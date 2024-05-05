@@ -121,7 +121,6 @@ const onSubmit = () => {
         warehouseImporter: warehouseImporter.value,
         SupplierContactInformation: SupplierContactInformation.value,
       }
-      console.log('data update: ', data);
       await axios.put(`${baseUrl}/v1/materials/${deviceDetail.id}`, data);
       await fetchDevice();
       closeNavigationDrawer();
