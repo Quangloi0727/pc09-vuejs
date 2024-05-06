@@ -43,15 +43,6 @@ const label = computed(() => useAttrs().label as string | undefined)
         },
       }"
     >
-      <template
-        v-for="(_, name) in $slots"
-        #[name]="slotProps"
-      >
-        <slot
-          :name="name"
-          v-bind="slotProps || {}"
-        />
-      </template>
     </VAutocomplete>
   </div>
 </template>
