@@ -24,7 +24,7 @@ deploy:
     - echo "$ID_RSA" >> ~/.ssh/id_rsa
     - chmod 600 ~/.ssh/id_rsa
     - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
-    - rsync -ravz --delete --group dist/ $SERVER_USER@$SERVER_IP:/var/www/frontend/
-    - curl -X POST --data '{"text":"The project ${CI_PROJECT_NAME} has been deployed."}' $SLACK_WEBHOOK
+    - rsync -ravz --group dist/ $SERVER_USER@$SERVER_IP:/home/khiemtv/www/frontend/phongtn
+    - curl -s -X POST "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage" -d "chat_id=$TELEGRAM_CHAT_ID" -d "text=The pipeline has completed $CI_PIPELINE_URL !!!"
   only:
     - main
