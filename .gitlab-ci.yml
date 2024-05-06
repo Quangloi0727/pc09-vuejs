@@ -1,0 +1,27 @@
+build site:
+  image: node:18.18.2
+  stage: build
+  script:
+    - pnpm -v
+    - pnpm install
+    - pnpm run build
+  artifacts:
+    expire_in: 1 week
+    paths:
+      - dist
+  only:
+    - main
+# deploy to pro
+deploy:
+  image: alpine
+  stage: deploy
+  script:
+    - apk add --no-cache rsync openssh curl
+    - mkdir -p ~/.ssh
+    - echo "$ID_RSA" >> ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+    - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+    - rsync -ravz --group dist/ $SERVER_USER@$SERVER_IP:/home/khiemtv/www/frontend/phongtn
+    - curl -X POST --data '{"text":"The project ${CI_PROJECT_NAME} has been deployed."}' $SLACK_WEBHOOK
+  only:
+    - main
