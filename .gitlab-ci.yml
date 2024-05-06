@@ -4,7 +4,7 @@ build site:
   script:
     - node -v
     - npm -v
-    - npm i -g pnpm
+    - npm i -g pnpm@8.6.2
     - pnpm -v
     - pnpm install
     - pnpm run build
