@@ -21,7 +21,7 @@ deploy:
     - echo "$ID_RSA" >> ~/.ssh/id_rsa
     - chmod 600 ~/.ssh/id_rsa
     - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
-    - rsync -ravz --group dist/ $SERVER_USER@$SERVER_IP:/home/khiemtv/www/frontend/phongtn
+    - rsync -ravz --delete --group dist/ $SERVER_USER@$SERVER_IP:/var/www/frontend/
     - curl -X POST --data '{"text":"The project ${CI_PROJECT_NAME} has been deployed."}' $SLACK_WEBHOOK
   only:
     - main
