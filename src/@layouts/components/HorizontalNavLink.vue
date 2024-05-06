@@ -31,11 +31,6 @@ const props = withDefaults(defineProps<Props>(), {
       :class="{ 'router-link-active router-link-exact-active': isNavLinkActive(item, $router) }"
     >
       <Component
-        :is="layoutConfig.app.iconRenderer || 'div'"
-        class="nav-item-icon"
-        v-bind="item.icon || layoutConfig.verticalNav.defaultNavItemIconProps"
-      />
-      <Component
         :is="layoutConfig.app.i18n.enable ? 'i18n-t' : 'span'"
         class="nav-item-title"
         v-bind="getDynamicI18nProps(item.title, 'span')"

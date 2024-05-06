@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-import { layoutConfig } from '@layouts'
-import { HorizontalNavLink, HorizontalNavPopper } from '@layouts/components'
-import { canViewNavMenuGroup } from '@layouts/plugins/casl'
-import { useLayoutConfigStore } from '@layouts/stores/config'
-import type { NavGroup } from '@layouts/types'
-import { getDynamicI18nProps, isNavGroupActive } from '@layouts/utils'
+import { layoutConfig } from '@layouts';
+import { HorizontalNavLink, HorizontalNavPopper } from '@layouts/components';
+import { canViewNavMenuGroup } from '@layouts/plugins/casl';
+import { useLayoutConfigStore } from '@layouts/stores/config';
+import type { NavGroup } from '@layouts/types';
+import { getDynamicI18nProps, isNavGroupActive } from '@layouts/utils';
 
 interface Props {
   item: NavGroup
@@ -57,11 +57,6 @@ watch(() => route.path, () => {
     :popper-inline-end="childrenAtEnd"
   >
     <div class="nav-group-label">
-      <Component
-        :is="layoutConfig.app.iconRenderer || 'div'"
-        class="nav-item-icon"
-        v-bind="item.icon || layoutConfig.verticalNav.defaultNavItemIconProps"
-      />
       <Component
         :is="layoutConfig.app.i18n.enable ? 'i18n-t' : 'span'"
         v-bind="getDynamicI18nProps(item.title, 'span')"

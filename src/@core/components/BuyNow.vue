@@ -9,19 +9,6 @@ watch(buyNowUrl, val => {
 })
 </script>
 
-<template>
-  <a
-    class="buy-now-button d-print-none"
-    role="button"
-    rel="noopener noreferrer"
-    :href="buyNowUrl"
-    target="_blank"
-  >
-    Buy Now
-    <span class="button-inner" />
-  </a>
-</template>
-
 <style lang="scss" scoped>
 .buy-now-button,
 .button-inner {

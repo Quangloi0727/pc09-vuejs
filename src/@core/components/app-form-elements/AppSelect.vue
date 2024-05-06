@@ -36,15 +36,6 @@ const label = computed(() => useAttrs().label as string | undefined)
         menuProps: { contentClass: ['app-inner-list', 'app-select__content', 'v-select__content', $attrs.multiple !== undefined ? 'v-list-select-multiple' : ''] },
       }"
     >
-      <template
-        v-for="(_, name) in $slots"
-        #[name]="slotProps"
-      >
-        <slot
-          :name="name"
-          v-bind="slotProps || {}"
-        />
-      </template>
     </VSelect>
   </div>
 </template>
