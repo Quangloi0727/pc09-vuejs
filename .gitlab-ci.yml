@@ -2,6 +2,9 @@ build site:
   image: node:18.18.2
   stage: build
   script:
+    - node -v
+    - npm -v
+    - npm i -g pnpm
     - pnpm -v
     - pnpm install
     - pnpm run build
