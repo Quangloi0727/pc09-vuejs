@@ -161,7 +161,8 @@ const widgetData = ref([
                 <template #item.code="{ item }">
                     <div class="d-flex flex-column">
                         <h6 class="text-base">
-                            <RouterLink :to="{ name: 'apps-user-view-id', params: { id: item.id } }"
+                            <RouterLink
+                                :to="{ name: 'manage-sample-separation-info-result-id', params: { id: item.id } }"
                                 class="font-weight-medium text-primary ">
                                 #{{ item.code }}
                             </RouterLink>
