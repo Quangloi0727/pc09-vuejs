@@ -43,57 +43,9 @@ export const handlerAppsUsers = [
     let filteredUsers = db.users
       .filter(
         (user) =>
-          (user.fullName.toLowerCase().includes(queryLower) ||
-            user.email.toLowerCase().includes(queryLower)) &&
-          user.role === (role || user.role) &&
-          user.currentPlan === (plan || user.currentPlan) &&
           user.status === (status || user.status)
       )
       .reverse();
-
-    // sort users
-    if (sortByLocal) {
-      console.log(sortByLocal);
-      if (sortByLocal === "user") {
-        filteredUsers = filteredUsers.sort((a, b) => {
-          if (orderByLocal === "asc")
-            return a.fullName.localeCompare(b.fullName);
-          else return b.fullName.localeCompare(a.fullName);
-        });
-      }
-      if (sortByLocal === "email") {
-        filteredUsers = filteredUsers.sort((a, b) => {
-          if (orderByLocal === "asc") return a.email.localeCompare(b.email);
-          else return b.email.localeCompare(a.email);
-        });
-      }
-      if (sortByLocal === "role") {
-        filteredUsers = filteredUsers.sort((a, b) => {
-          if (orderByLocal === "asc") return a.role.localeCompare(b.role);
-          else return b.role.localeCompare(a.role);
-        });
-      }
-      if (sortByLocal === "plan") {
-        filteredUsers = filteredUsers.sort((a, b) => {
-          if (orderByLocal === "asc")
-            return a.currentPlan.localeCompare(b.currentPlan);
-          else return b.currentPlan.localeCompare(a.currentPlan);
-        });
-      }
-      if (sortByLocal === "status") {
-        filteredUsers = filteredUsers.sort((a, b) => {
-          if (orderByLocal === "asc") return a.status.localeCompare(b.status);
-          else return b.status.localeCompare(a.status);
-        });
-      }
-      if (sortByLocal === "billing") {
-        filteredUsers = filteredUsers.sort((a, b) => {
-          if (orderByLocal === "asc") return a.billing.localeCompare(b.billing);
-          else return b.billing.localeCompare(a.billing);
-        });
-      }
-    }
-
     const totalUsers = filteredUsers.length;
 
     // total pages
