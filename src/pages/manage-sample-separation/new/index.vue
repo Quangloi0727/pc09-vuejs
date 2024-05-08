@@ -1,41 +1,4 @@
 <script setup lang="ts">
-import type { CustomInputContent } from '@core/types';
-
-const radioContent: CustomInputContent[] = [
-    {
-        title: 'Standard',
-        desc: 'Delivery in 3-5 days.',
-        value: 'standard',
-        icon: { icon: 'tabler-briefcase-2', size: '32' },
-    },
-    {
-        title: 'Express',
-        desc: 'Delivery within 2 days.',
-        value: 'express',
-        icon: { icon: 'tabler-rocket', size: '32' },
-    },
-    {
-        title: 'Overnight',
-        desc: 'Delivery within a days.',
-        value: 'overnight',
-        icon: { icon: 'tabler-crown', size: '32' },
-    },
-];
-
-const promoCodeList = [
-    {
-        code: 'TAKEITALL',
-        desc: 'Apply this code to get 15% discount on orders above 20$.',
-    },
-    {
-        code: 'FESTIVE10',
-        desc: 'Apply this code to get 10% discount on all orders.',
-    },
-    {
-        code: 'MYSTERYDEAL',
-        desc: 'Apply this code to get discount between 10% - 50%.',
-    },
-];
 
 const formData = ref({
     fullName: '',
@@ -57,6 +20,27 @@ const formData = ref({
     cardExDate: '',
     cardCvv: '',
 });
+
+// Data table options
+const itemsPerPage = ref(10);
+const page = ref(1);
+const totalUsers = ref(10);
+
+// Headers
+const headers = [
+    { title: 'Tên mẫu', key: 'name', sortable: false },
+    { title: 'Người thêm', key: 'createdBy', sortable: false },
+    { title: 'Mẫu máu', key: 'templateBlood', sortable: false },
+    { title: 'Phân loại', key: 'type', sortable: false },
+];
+
+const data = [
+    { name: '1123', createdBy: 'Nguyễn Văn A', templateBlood: 'Máu A', type: 'Tốt', sortable: false },
+    { name: '4343', createdBy: 'Nguyễn Văn B', templateBlood: 'Máu A', type: 'Tốt', sortable: false },
+    { name: '3223', createdBy: 'Nguyễn Văn C', templateBlood: 'Máu 0', type: 'Xấu', sortable: false },
+    { name: '3263', createdBy: 'Nguyễn Văn D', templateBlood: 'Máu AB', type: 'Tốt', sortable: false },
+];
+
 </script>
 
 <template>
@@ -99,13 +83,68 @@ const formData = ref({
                             </VCol>
 
                             <VCol cols="12">
-                                <div>
-                                    <TiptapEditor v-model="formData.contactNumber" label="Ghi chú"
-                                        class="border rounded basic-editor" />
-                                </div>
+                                <label class="v-label mb-1 text-body-2">Ghi chú</label>
+                                <TiptapEditor v-model="formData.city" label="Ghi chú"
+                                    class="border rounded basic-editor" />
                             </VCol>
                         </VRow>
                     </VForm>
+                </VCol>
+            </VRow>
+        </VCardText>
+    </VCard>
+    <VCard class="overflow-visible mt-10">
+        <VCardText>
+            <VRow>
+                <VCol md="11" cols="12" class="mx-auto">
+                    <h5 class="text-h6">
+                        Chọn mẫu máu
+                    </h5>
+                </VCol>
+                <VCol md="11" cols="12" class="mx-auto">
+                    <VBtn prepend-icon="tabler-plus" :to="{ name: 'manage-sample-separation-select-template' }">
+                        Chọn mẫu
+                    </VBtn>
+                </VCol>
+            </VRow>
+        </VCardText>
+    </VCard>
+    <VCard class="overflow-visible mt-10">
+        <VCardText>
+            <VRow>
+                <VCol md="11" cols="12" class="mx-auto">
+                    <h5 class="text-h6">
+                        Danh sách mẫu
+                    </h5>
+                </VCol>
+                <VCol md="11" cols="12" class="mx-auto">
+                    <AppSelect :model-value="itemsPerPage" :items="[
+                        { value: 10, title: '10' },
+                        { value: 25, title: '25' },
+                        { value: 50, title: '50' },
+                        { value: 100, title: '100' },
+                    ]" style="inline-size: 6.25rem;" @update:model-value="itemsPerPage = parseInt($event, 10)" />
+                    <!-- SECTION datatable -->
+                    <VDataTableServer v-model:items-per-page="itemsPerPage" v-model:page="page" :items="data"
+                        :items-length="totalUsers" :headers="headers" class="text-no-wrap">
+
+                        <template #item.name="{ item }">
+                            <div class="d-flex flex-column">
+                                <h6 class="text-base">
+                                    <RouterLink :to="{ name: 'manage-sample-separation-new' }"
+                                        class="font-weight-medium text-primary ">
+                                        #{{ item.name }}
+                                    </RouterLink>
+                                </h6>
+                            </div>
+                        </template>
+                        <!-- pagination -->
+                        <template #bottom>
+                            <TablePagination v-model:page="page" :items-per-page="itemsPerPage"
+                                :total-items="totalUsers" />
+                        </template>
+                    </VDataTableServer>
+                    <!-- SECTION -->
                 </VCol>
             </VRow>
         </VCardText>
