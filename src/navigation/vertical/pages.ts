@@ -15,5 +15,5 @@ export default [
     children: [
       { title: 'Danh sách', to: 'manage-sample-separation-list' },
     ],
-  },
+  }
 ];
