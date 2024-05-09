@@ -11,12 +11,6 @@ const page = ref(1);
 const sortBy = ref();
 const orderBy = ref();
 
-// Update data table options
-const updateOptions = (options: any) => {
-    sortBy.value = options.sortBy[0]?.key;
-    orderBy.value = options.sortBy[0]?.order;
-};
-
 // Headers
 const headers = [
     { title: 'Mã số hồ sơ', key: 'code', sortable: false },
@@ -61,17 +55,6 @@ const getValueStatus = (st: string) => {
     const findStatus = status.find(s => s.value === st);
     if (findStatus) return findStatus.title;
     return st;
-};
-
-// 👉 Add new user
-const addNewUser = async (userData: UserProperties) => {
-    await $api('/apps/users', {
-        method: 'POST',
-        body: userData,
-    });
-
-    // refetch User
-    fetchUsers();
 };
 
 // 👉 Delete user
@@ -155,8 +138,7 @@ const widgetData = ref([
 
             <!-- SECTION datatable -->
             <VDataTableServer v-model:items-per-page="itemsPerPage" v-model:page="page" :items="users"
-                :items-length="totalUsers" :headers="headers" class="text-no-wrap" show-select
-                @update:options="updateOptions">
+                :items-length="totalUsers" :headers="headers" class="text-no-wrap" show-select>
                 <!-- User -->
                 <template #item.code="{ item }">
                     <div class="d-flex flex-column">

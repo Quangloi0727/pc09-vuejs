@@ -16,15 +16,39 @@ const headers = [
     { title: 'Phương pháp chiết tách ADN', key: 'method', sortable: false },
 ];
 
-const data = [
+const data1 = ref([
     { code: '1123', method: 'Phương pháp 1', sortable: false },
     { code: '4343', method: 'Phương pháp 2', sortable: false },
     { code: '3223', method: 'Phương pháp 3', sortable: false },
     { code: '3263', method: 'Phương pháp 4', sortable: false },
-];
+]);
+
+const data2 = ref([{ code: '56546', method: 'Phương pháp 1', sortable: false }]);
+
+let dataSelected: any = [];
+let dataUnSelected: any = [];
+
+const getDataSelected = (value: any) => {
+    dataSelected = value;
+};
+
+const getDataUnSelected = (value: any) => {
+    dataUnSelected = value;
+};
+
+const addDataSelected = () => {
+    const dataRemove = data1.value.filter(item => dataSelected.includes(item.code));
+    data2.value.push(...dataRemove);
+    data1.value = data1.value.filter(item => !dataSelected.includes(item.code));
+};
+
+const removeDataSelected = () => {
+    const dataRemove = data2.value.filter(item => dataUnSelected.includes(item.code));
+    data1.value.push(...dataRemove);
+    data2.value = data2.value.filter(item => !dataUnSelected.includes(item.code));
+};
 
 </script>
-
 <template>
     <VCard class="overflow-visible">
         <div class="w-100 sticky-header overflow-hidden rounded-t">
@@ -51,7 +75,7 @@ const data = [
                             <div class="app-user-search-filter d-flex align-center flex-wrap gap-4">
                                 <!-- 👉 Search  -->
                                 <div style="inline-size: 15.625rem;">
-                                    <AppTextField placeholder="Search" />
+                                    <AppTextField placeholder="Search" modelValue="" />
                                 </div>
                                 <div style="inline-size: 10.625rem;">
                                     <!-- 👉 Select Plan -->
@@ -60,18 +84,17 @@ const data = [
                                 </div>
                             </div>
                         </VCardText>
-
-
                         <VDivider />
 
                         <!-- SECTION datatable -->
-                        <VDataTableServer :items="data" :items-length="totalUsers" :headers="headers"
-                            class="text-no-wrap" show-select>
+                        <VDataTableServer :items="data1" :items-length="totalUsers" :headers="headers"
+                            class="text-no-wrap" show-select @update:model-value="getDataSelected" item-value="code">
                             <!-- User -->
                             <template #item.code="{ item }">
                                 <div class="d-flex flex-column">
                                     <h6 class="text-base">
-                                        <RouterLink :to="{ name: 'apps-user-view-id', params: { id: item.code } }"
+                                        <RouterLink
+                                            :to="{ name: 'manage-sample-separation-info-result-id', params: { id: item.code } }"
                                             class="font-weight-medium text-primary ">
                                             #{{ item.code }}
                                         </RouterLink>
@@ -86,7 +109,7 @@ const data = [
                         </VDataTableServer>
                         <!-- SECTION -->
                         <VCol offset-md="8" cols="12">
-                            <VBtn>
+                            <VBtn @click="addDataSelected">
                                 Kích hoạt
                                 <VIcon end icon=" tabler-arrow-narrow-right" />
                             </VBtn>
@@ -103,7 +126,7 @@ const data = [
                             <div class="app-user-search-filter d-flex align-center flex-wrap gap-4">
                                 <!-- 👉 Search  -->
                                 <div style="inline-size: 15.625rem;">
-                                    <AppTextField placeholder="Search" />
+                                    <AppTextField placeholder="Search" modelValue="" />
                                 </div>
                                 <div style="inline-size: 10.625rem;">
                                     <!-- 👉 Select Plan -->
@@ -115,13 +138,15 @@ const data = [
                         <VDivider />
 
                         <!-- SECTION datatable -->
-                        <VDataTableServer v-model:items-per-page="itemsPerPage" v-model:page="page" :items="data"
-                            :items-length="totalUsers" :headers="headers" class="text-no-wrap" show-select>
+                        <VDataTableServer v-model:items-per-page="itemsPerPage" v-model:page="page" :items="data2"
+                            :items-length="totalUsers" :headers="headers" class="text-no-wrap" show-select
+                            @update:model-value="getDataUnSelected" item-value="code">
                             <!-- User -->
                             <template #item.code="{ item }">
                                 <div class="d-flex flex-column">
                                     <h6 class="text-base">
-                                        <RouterLink :to="{ name: 'apps-user-view-id', params: { id: item.code } }"
+                                        <RouterLink
+                                            :to="{ name: 'manage-sample-separation-info-result-id', params: { id: item.code } }"
                                             class="font-weight-medium text-primary ">
                                             #{{ item.code }}
                                         </RouterLink>
@@ -134,7 +159,11 @@ const data = [
                                     :total-items="totalUsers" />
                             </template>
                         </VDataTableServer>
-                        <VCol offset-md="9" cols="12">
+                        <VCol class="d-flex flex-wrap gap-4 justify-sm-space-between justify-center">
+                            <VBtn color="secondary" @click="removeDataSelected">
+                                <VIcon icon="tabler-arrow-left" start class="flip-in-rtl" />
+                                Hủy kích hoạt
+                            </VBtn>
                             <VBtn>
                                 Next
                                 <VIcon end icon="tabler-arrow-narrow-right" />

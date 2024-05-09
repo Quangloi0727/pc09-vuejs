@@ -15,8 +15,6 @@ const numberedSteps = [
 ];
 
 const currentStep = ref(0);
-const isPasswordVisible = ref(false);
-const isCPasswordVisible = ref(false);
 
 // Data table options
 const itemsPerPage = ref(10);
@@ -38,25 +36,6 @@ const data = [
     { locus: '743n3', typeGen: 'Kiểu gen 4', flag: '', pi: '947', sortable: false },
 ];
 
-const formData = ref({
-    username: '',
-    email: '',
-    password: '',
-    cPassword: '',
-    firstName: '',
-    lastName: '',
-    country: undefined,
-    language: undefined,
-    twitter: '',
-    facebook: '',
-    googlePlus: '',
-    LinkedIn: '',
-
-});
-
-const onSubmit = () => {
-    console.log(formData.value);
-};
 </script>
 
 <template>
@@ -99,7 +78,7 @@ const onSubmit = () => {
                                     <VCol cols="12" md="6">
                                         <AppDateTimePicker label="Ngày trả kết quả mẫu"
                                             prepend-inner-icon="tabler-calendar" placeholder="Chọn ngày tạo"
-                                            :config="{ dateFormat: 'd/m/Y' }" />
+                                            :config="{ dateFormat: 'd/m/Y' }" modelValue="" />
                                     </VCol>
 
                                     <VCol cols="12" md="6">
@@ -169,7 +148,7 @@ const onSubmit = () => {
                                     <VCol cols="12" md="6">
                                         <AppDateTimePicker label="Ngày trả kết quả mẫu"
                                             prepend-inner-icon="tabler-calendar" placeholder="Chọn ngày tạo"
-                                            :config="{ dateFormat: 'd/m/Y' }" />
+                                            :config="{ dateFormat: 'd/m/Y' }" modelValue="" />
                                     </VCol>
 
                                     <VCol cols="12" md="6">
@@ -222,7 +201,7 @@ const onSubmit = () => {
                                     <VCol cols="12" md="6">
                                         <AppDateTimePicker label="Ngày trả kết quả mẫu"
                                             prepend-inner-icon="tabler-calendar" placeholder="Chọn ngày tạo"
-                                            :config="{ dateFormat: 'd/m/Y' }" />
+                                            :config="{ dateFormat: 'd/m/Y' }" modelValue="" />
                                     </VCol>
 
                                     <VCol cols="12" md="6">
@@ -280,13 +259,14 @@ const onSubmit = () => {
             <VCard title="Thông tin quá trình phân tách" class="mb-6">
                 <VCardText>
                     <AppDateTimePicker label="Giờ lấy mẫu" prepend-inner-icon="tabler-calendar" placeholder="Chọn giờ"
-                        :config="{ enableTime: true, noCalendar: true, dateFormat: 'H:i' }" class="mb-6" />
+                        :config="{ enableTime: true, noCalendar: true, dateFormat: 'H:i' }" class="mb-6"
+                        modelValue="" />
                     <AppDateTimePicker label="Thơi gian thực hiện" prepend-inner-icon="tabler-calendar"
-                        placeholder="Chọn thời gian" :config="{ dateFormat: 'd/m/Y' }" class="mb-6" />
+                        placeholder="Chọn thời gian" :config="{ dateFormat: 'd/m/Y' }" class="mb-6" modelValue="" />
                     <AppDateTimePicker label="Thơi gian vào mẫu" prepend-inner-icon="tabler-calendar"
-                        placeholder="Chọn thời gian" :config="{ dateFormat: 'd/m/Y' }" class="mb-6" />
+                        placeholder="Chọn thời gian" :config="{ dateFormat: 'd/m/Y' }" class="mb-6" modelValue="" />
                     <AppDateTimePicker label="Thơi gian trả kết quả" prepend-inner-icon="tabler-calendar"
-                        placeholder="Chọn thời gian" :config="{ dateFormat: 'd/m/Y' }" class="mb-6" />
+                        placeholder="Chọn thời gian" :config="{ dateFormat: 'd/m/Y' }" class="mb-6" modelValue="" />
                     <AppTextField label="Kết quả cuối" placeholder="Kết quả cuối" class="mb-6" />
                 </VCardText>
             </VCard>
