@@ -1,5 +1,5 @@
-import { createFetch } from '@vueuse/core'
-import { destr } from 'destr'
+import { createFetch } from '@vueuse/core';
+import { destr } from 'destr';
 
 export const useApi = createFetch({
   baseUrl: import.meta.env.VITE_API_BASE_URL || '/api',
@@ -11,32 +11,111 @@ export const useApi = createFetch({
   options: {
     refetch: true,
     async beforeFetch({ options }) {
-      const accessToken = useCookie('accessToken').value
+      const accessToken = useCookie('accessToken').value;
 
       if (accessToken) {
         options.headers = {
           ...options.headers,
           Authorization: `Bearer ${accessToken}`,
 
-        }
+        };
       }
 
-      return { options }
+      return { options };
     },
     afterFetch(ctx) {
-      const { data, response } = ctx
+      const { data, response } = ctx;
 
       // Parse data if it's JSON
 
-      let parsedData = null
+      let parsedData = null;
       try {
-        parsedData = destr(data)
+        parsedData = destr(data);
       }
       catch (error) {
-        console.error(error)
+        console.error(error);
       }
 
-      return { data: parsedData, response }
+      return { data: parsedData, response };
     },
   },
-})
+});
+
+export const useApiFetchConfigService = createFetch({
+  baseUrl: import.meta.env.VITE_API_BASE_URL_CONFIG,
+  fetchOptions: {
+    headers: {
+      Accept: 'application/json',
+    },
+  },
+  options: {
+    refetch: true,
+    async beforeFetch({ options }) {
+      const accessToken = useCookie('accessToken').value;
+
+      if (accessToken) {
+        options.headers = {
+          ...options.headers,
+          Authorization: `Bearer ${accessToken}`,
+
+        };
+      }
+
+      return { options };
+    },
+    afterFetch(ctx) {
+      const { data, response } = ctx;
+
+      // Parse data if it's JSON
+
+      let parsedData = null;
+      try {
+        parsedData = destr(data);
+      }
+      catch (error) {
+        console.error(error);
+      }
+
+      return { data: parsedData, response };
+    },
+  },
+});
+export const useApiFetchAiService = createFetch({
+  baseUrl: import.meta.env.VITE_API_BASE_URL_AI,
+  fetchOptions: {
+    headers: {
+      Accept: 'application/json',
+    },
+  },
+  options: {
+    refetch: true,
+    async beforeFetch({ options }) {
+      const accessToken = useCookie('accessToken').value;
+
+      if (accessToken) {
+        options.headers = {
+          ...options.headers,
+          Authorization: `Bearer ${accessToken}`,
+
+        };
+      }
+
+      return { options };
+    },
+    afterFetch(ctx) {
+      const { data, response } = ctx;
+
+      // Parse data if it's JSON
+
+      let parsedData = null;
+      try {
+        parsedData = destr(data);
+      }
+      catch (error) {
+        console.error(error);
+      }
+
+      return { data: parsedData, response };
+    },
+  },
+});

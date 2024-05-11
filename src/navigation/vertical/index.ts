@@ -1,4 +1,4 @@
 import type { VerticalNavItems } from '@layouts/types';
-import appsAndPages from './pages';
+import pages from './pages';
 
-export default [...appsAndPages] as VerticalNavItems;
+export default [...pages] as VerticalNavItems;

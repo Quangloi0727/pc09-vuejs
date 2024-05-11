@@ -6,6 +6,11 @@
 export {}
 declare global {
   const $api: typeof import('./src/utils/api')['$api']
+  const $fetchApiAiService: typeof import('./src/utils/api')['$fetchApiAiService']
+  const $fetchApiAiServiceImage: typeof import('./src/utils/api')['$fetchApiAiServiceImage']
+  const $fetchApiImageService: typeof import('./src/utils/api')['$fetchApiImageService']
+  const $fetchApiService: typeof import('./src/utils/api')['$fetchApiService']
+  const $fetchApiServiceImage: typeof import('./src/utils/api')['$fetchApiServiceImage']
   const COOKIE_MAX_AGE_1_YEAR: typeof import('./src/utils/constants')['COOKIE_MAX_AGE_1_YEAR']
   const CreateUrl: typeof import('./src/@core/composable/CreateUrl')['CreateUrl']
   const EffectScope: typeof import('vue')['EffectScope']
@@ -160,6 +165,11 @@ declare global {
   const useActiveElement: typeof import('@vueuse/core')['useActiveElement']
   const useAnimate: typeof import('@vueuse/core')['useAnimate']
   const useApi: typeof import('./src/composables/useApi')['useApi']
+  const useApiFetchA: typeof import('./src/composables/useApi')['useApiFetchA']
+  const useApiFetchAi: typeof import('./src/composables/useApi')['useApiFetchAi']
+  const useApiFetchAiSer: typeof import('./src/composables/useApi')['useApiFetchAiSer']
+  const useApiFetchAiService: typeof import('./src/composables/useApi')['useApiFetchAiService']
+  const useApiFetchConfigService: typeof import('./src/composables/useApi')['useApiFetchConfigService']
   const useArrayDifference: typeof import('@vueuse/core')['useArrayDifference']
   const useArrayEvery: typeof import('@vueuse/core')['useArrayEvery']
   const useArrayFilter: typeof import('@vueuse/core')['useArrayFilter']
@@ -368,6 +378,8 @@ declare module 'vue' {
   interface GlobalComponents {}
   interface ComponentCustomProperties {
     readonly $api: UnwrapRef<typeof import('./src/utils/api')['$api']>
+    readonly $fetchApiAiService: UnwrapRef<typeof import('./src/utils/api')['$fetchApiAiService']>
+    readonly $fetchApiImageService: UnwrapRef<typeof import('./src/utils/api')['$fetchApiImageService']>
     readonly COOKIE_MAX_AGE_1_YEAR: UnwrapRef<typeof import('./src/utils/constants')['COOKIE_MAX_AGE_1_YEAR']>
     readonly EffectScope: UnwrapRef<typeof import('vue')['EffectScope']>
     readonly acceptHMRUpdate: UnwrapRef<typeof import('pinia')['acceptHMRUpdate']>
@@ -519,6 +531,8 @@ declare module 'vue' {
     readonly useActiveElement: UnwrapRef<typeof import('@vueuse/core')['useActiveElement']>
     readonly useAnimate: UnwrapRef<typeof import('@vueuse/core')['useAnimate']>
     readonly useApi: UnwrapRef<typeof import('./src/composables/useApi')['useApi']>
+    readonly useApiFetchAiService: UnwrapRef<typeof import('./src/composables/useApi')['useApiFetchAiService']>
+    readonly useApiFetchConfigService: UnwrapRef<typeof import('./src/composables/useApi')['useApiFetchConfigService']>
     readonly useArrayDifference: UnwrapRef<typeof import('@vueuse/core')['useArrayDifference']>
     readonly useArrayEvery: UnwrapRef<typeof import('@vueuse/core')['useArrayEvery']>
     readonly useArrayFilter: UnwrapRef<typeof import('@vueuse/core')['useArrayFilter']>
@@ -715,6 +729,8 @@ declare module '@vue/runtime-core' {
   interface GlobalComponents {}
   interface ComponentCustomProperties {
     readonly $api: UnwrapRef<typeof import('./src/utils/api')['$api']>
+    readonly $fetchApiAiService: UnwrapRef<typeof import('./src/utils/api')['$fetchApiAiService']>
+    readonly $fetchApiImageService: UnwrapRef<typeof import('./src/utils/api')['$fetchApiImageService']>
     readonly COOKIE_MAX_AGE_1_YEAR: UnwrapRef<typeof import('./src/utils/constants')['COOKIE_MAX_AGE_1_YEAR']>
     readonly EffectScope: UnwrapRef<typeof import('vue')['EffectScope']>
     readonly acceptHMRUpdate: UnwrapRef<typeof import('pinia')['acceptHMRUpdate']>
@@ -866,6 +882,8 @@ declare module '@vue/runtime-core' {
     readonly useActiveElement: UnwrapRef<typeof import('@vueuse/core')['useActiveElement']>
     readonly useAnimate: UnwrapRef<typeof import('@vueuse/core')['useAnimate']>
     readonly useApi: UnwrapRef<typeof import('./src/composables/useApi')['useApi']>
+    readonly useApiFetchAiService: UnwrapRef<typeof import('./src/composables/useApi')['useApiFetchAiService']>
+    readonly useApiFetchConfigService: UnwrapRef<typeof import('./src/composables/useApi')['useApiFetchConfigService']>
     readonly useArrayDifference: UnwrapRef<typeof import('@vueuse/core')['useArrayDifference']>
     readonly useArrayEvery: UnwrapRef<typeof import('@vueuse/core')['useArrayEvery']>
     readonly useArrayFilter: UnwrapRef<typeof import('@vueuse/core')['useArrayFilter']>
