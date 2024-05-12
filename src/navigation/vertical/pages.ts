@@ -15,5 +15,12 @@ export default [
     children: [
       { title: 'Danh sách', to: 'manage-sample-separation-list' },
     ],
+  },
+  {
+    title: 'Tra cứu thông tin',
+    icon: { icon: 'tabler-database-search' },
+    children: [
+      { title: 'Tàng thư dấu vết hình sự', to: 'manage-criminal-trace-general' },
+    ],
   }
 ];
