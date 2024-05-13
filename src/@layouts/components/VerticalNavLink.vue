@@ -17,7 +17,8 @@ const hideTitleAndBadge = configStore.isVerticalNavMini();
   <li v-if="can(item.action, item.subject)" class="nav-link" :class="{ disabled: item.disable }">
     <Component :is="item.to ? 'RouterLink' : 'a'" v-bind="getComputedNavLinkToProp(item)"
       :class="{ 'router-link-active router-link-exact-active': isNavLinkActive(item, $router) }">
-      <Component :is="layoutConfig.app.iconRenderer || 'div'" class="nav-item-icon" />
+      <Component :is="layoutConfig.app.iconRenderer || 'div'"
+        v-bind="item.icon || layoutConfig.verticalNav.defaultNavItemIconProps" class="nav-item-icon" />
       <TransitionGroup name="transition-slide-x">
         <!-- 👉 Title -->
         <Component :is="layoutConfig.app.i18n.enable ? 'i18n-t' : 'span'" v-show="!hideTitleAndBadge" key="title"
