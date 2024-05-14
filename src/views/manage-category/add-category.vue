@@ -17,13 +17,6 @@ const emit = defineEmits<Emit>();
 const isFormValid = ref(false);
 const refForm = ref<VForm>();
 const name = ref('');
-const code = ref('');
-const manufacturer = ref('');
-const model = ref('');
-const seri = ref();
-const datePutIntoUse = ref('');
-const maintenanceHistory = ref('');
-const warrantyInformation = ref('');
 
 // 👉 drawer close
 const closeNavigationDrawer = () => {
@@ -60,6 +53,17 @@ const onSubmit = () => {
 const handleDrawerModelValueUpdate = (val: boolean) => {
   emit('update:isDrawerOpen', val);
 };
+
+const counter = ref<any[]>([{ name: '' }]);
+
+const addField = () => {
+  counter.value.push({ name: '' });
+};
+
+const removeField = (index: number) => {
+  counter.value.splice(index, 1);
+}
+
 </script>
 
 <template>
@@ -87,31 +91,24 @@ const handleDrawerModelValueUpdate = (val: boolean) => {
                 <label class="v-label mb-1 text-body-2">Ghi chú</label>
                 <TiptapEditor label="Ghi chú" class="border rounded basic-editor" model-value="" />
               </VCol>
-
-              <!-- 👉 Email -->
-              <VCol cols="12">
-                <AppTextField v-model="name" :rules="[requiredValidator]" label="Tên danh mục aaa"
-                  placeholder="Tên danh mục aaa" />
-              </VCol>
-
-              <!-- 👉 model -->
-              <VCol cols="12">
-                <AppTextField v-model="name" :rules="[requiredValidator]" label="Tên danh mục bbb"
-                  placeholder="Tên danh mục bbb" />
-              </VCol>
-              <VCol cols="12">
-                <VLabel class="d-flex">
-                  <div class="d-flex text-sm justify-space-between w-100">
-                    <div class="text-high-emphasis">
-                      Thêm trường thông tin
+              <template v-for="(field, index) in counter" :key="index">
+                <VCol cols="12">
+                  <VLabel class="d-flex">
+                    <div class="d-flex text-sm justify-space-between w-100">
+                      <div class="text-high-emphasis">
+                        Thêm trường thông tin
+                      </div>
                     </div>
+                  </VLabel>
+                  <div class="d-flex gap-x-4">
+                    <AppTextField v-model="field.name" :rules="[requiredValidator]"
+                      placeholder="Thêm trường thông tin" />
+                    <VBtn v-if="index === counter.length - 1" @click="addField" rounded icon="tabler-plus"
+                      variant="tonal" />
+                    <VBtn v-else @click="() => removeField(index)" rounded icon="tabler-minus" variant="tonal" />
                   </div>
-                </VLabel>
-                <div class="d-flex gap-x-4">
-                  <AppTextField v-model="name" :rules="[requiredValidator]" placeholder="Thêm trường thông tin" />
-                  <VBtn rounded icon="tabler-plus" variant="tonal" />
-                </div>
-              </VCol>
+                </VCol>
+              </template>
               <!-- 👉 Submit and Cancel -->
               <VCol cols="12">
                 <VBtn type="submit" class="me-3">
