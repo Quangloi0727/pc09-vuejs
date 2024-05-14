@@ -22,5 +22,10 @@ export default [
     children: [
       { title: 'Tàng thư dấu vết hình sự', to: 'manage-criminal-trace-general' },
     ],
-  }
+  },
+  {
+    title: 'Quản lý danh mục',
+    icon: { icon: 'tabler-category' },
+    to: 'manage-category',
+  },
 ];

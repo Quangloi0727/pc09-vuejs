@@ -2,7 +2,7 @@
 // Data table options
 const itemsPerPage = ref(10);
 const page = ref(1);
-const formData = ref({
+const formData: any = ref({
     info: '',
     code: '',
     type: '',
@@ -44,16 +44,6 @@ const totalData = computed(() => listDataTable.value.data.recordsTotal);
 
 const urlImage = import.meta.env.VITE_API_BASE_URL_IMAGE;
 
-// 👉 Delete user
-const deleteUser = async (id: number) => {
-    await $api(`/apps/users/${id}`, {
-        method: 'DELETE',
-    });
-
-    // refetch User
-    // TODO: Make this async
-    fetchUsers();
-};
 const sourceImage = ref("");
 const showImage = (file: Event) => {
     const fileReader = new FileReader();
@@ -68,7 +58,7 @@ const showImage = (file: Event) => {
         };
     }
 };
-const handleRemoveFile = (file: Event) => {
+const handleRemoveFile = () => {
     sourceImage.value = "";
 };
 
@@ -89,9 +79,9 @@ const onSubmit = async () => {
     fetchData();
 };
 const editDialog = ref(false);
-const editedItem = ref(formData.value);
+const editedItem: any = ref(formData.value);
 // 👉 methods
-const editItem = (item) => {
+const editItem = (item: any) => {
     editedItem.value = { ...item };
     editDialog.value = true;
 };
@@ -99,7 +89,7 @@ const editItem = (item) => {
 const close = () => {
     editDialog.value = false;
 };
-const save = async (id) => {
+const save = async (id: any) => {
     await $fetchApiAiService('/sample/edit', {
         method: 'PUT',
         body: {
@@ -115,20 +105,23 @@ const save = async (id) => {
 };
 
 const deleteDialog = ref(false);
-const deleteItem = (item: Data) => {
+const deleteItem = (item: any) => {
     editedItem.value = { ...item };
     deleteDialog.value = true;
 };
 const closeDelete = () => {
     deleteDialog.value = false;
 };
-const deleteItemConfirm = async (id) => {
+const deleteItemConfirm = async (id: any) => {
     await $fetchApiAiService(`/sample/delete/${id}`, {
         method: 'PUT',
 
     });
     closeDelete();
     fetchData();
+};
+const getUrlImage = (item: any) => {
+    return urlImage + '/' + item.type + '/' + item.img_url;
 };
 </script>
 
@@ -221,11 +214,11 @@ const deleteItemConfirm = async (id) => {
             :items-length="totalData" class="text-no-wrap">
             <!-- product  -->
             <template #item.image="{ item }">
-                <VImg :src="urlImage + '/' + item.type + '/' + item.img_url" width="70" height="70" />
+                <VImg :src="getUrlImage(item)" width="70" height="70" />
             </template>
             <template #item.index="{ item, index }">
                 <div class="d-flex align-center gap-x-4">
-                    <span class="text-body-1 text-high-emphasis">{{ index+=1 }}</span>
+                    <span class="text-body-1 text-high-emphasis">{{ index + 1 }}</span>
                 </div>
             </template>
 

@@ -48,6 +48,7 @@ declare module 'vue-router/auto/routes' {
     'apps-user-view-id': RouteRecordInfo<'apps-user-view-id', '/apps/user/view/:id', { id: ParamValue<true> }, { id: ParamValue<false> }>,
     'forgot-password': RouteRecordInfo<'forgot-password', '/forgot-password', Record<never, never>, Record<never, never>>,
     'login': RouteRecordInfo<'login', '/login', Record<never, never>, Record<never, never>>,
+    'manage-category': RouteRecordInfo<'manage-category', '/manage-category', Record<never, never>, Record<never, never>>,
     'manage-criminal-trace-general': RouteRecordInfo<'manage-criminal-trace-general', '/manage-criminal-trace/general', Record<never, never>, Record<never, never>>,
     'manage-sample-separation-info-result-id': RouteRecordInfo<'manage-sample-separation-info-result-id', '/manage-sample-separation/info-result/:id', { id: ParamValue<true> }, { id: ParamValue<false> }>,
     'manage-sample-separation-list': RouteRecordInfo<'manage-sample-separation-list', '/manage-sample-separation/list', Record<never, never>, Record<never, never>>,
