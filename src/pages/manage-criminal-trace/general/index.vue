@@ -5,8 +5,8 @@ const page = ref(1);
 const formData: any = ref({
     info: '',
     code: '',
-    type: '',
-    timecreated: ''
+    type: null,
+    timecreated: null
 });
 const searchAdvance = ref();
 const typeAdvance = ref();
@@ -172,9 +172,21 @@ const getUrlImage = (item: any) => {
                     </VForm>
                 </VCol>
                 <VCol md="5" cols="12" class="mx-auto">
-                    <VCardText class="d-flex">
-                        <VImg :src="sourceImage" width="300" height="300" class="w-100 mx-auto" />
-                    </VCardText>
+                    <VCard class="overflow-visible mt-15">
+                        <VCardText class="d-flex">
+                            <VImg v-if="sourceImage !== ''" :src="sourceImage" width="300" height="300"
+                                class="w-100 mx-auto" />
+                            <div v-else
+                                class="d-flex flex-column justify-center align-center gap-y-6 pa-6 drop-zone rounded">
+                                <IconBtn variant="tonal" class="rounded-sm">
+                                    <VIcon icon="tabler-photo-filled" />
+                                </IconBtn>
+                                <VBtn variant="tonal" size="small">
+                                    Vui lòng chọn ảnh để hiện thị preview
+                                </VBtn>
+                            </div>
+                        </VCardText>
+                    </VCard>
                 </VCol>
             </VRow>
         </VCardText>
