@@ -4,24 +4,30 @@ import type { VForm } from 'vuetify/components/VForm';
 
 interface Emit {
   (e: 'update:isDrawerOpen', value: boolean): void;
-  //(e: 'userData', value: any): void;
+  (e: 'addCategory', value: any): void;
 }
 
 interface Props {
   isDrawerOpen: boolean;
+  parentId: String;
 }
+
 
 const props = defineProps<Props>();
 const emit = defineEmits<Emit>();
 
 const isFormValid = ref(false);
 const refForm = ref<VForm>();
-const name = ref('');
+const formData = ref({
+  name: '',
+  note: '',
+  fields: [{ name: '' }],
+  parentId: props.parentId
+});
 
 // 👉 drawer close
 const closeNavigationDrawer = () => {
   emit('update:isDrawerOpen', false);
-
   nextTick(() => {
     refForm.value?.reset();
     refForm.value?.resetValidation();
@@ -29,40 +35,29 @@ const closeNavigationDrawer = () => {
 };
 
 const onSubmit = () => {
-  // refForm.value?.validate().then(({ valid }) => {
-  //   if (valid) {
-  //     emit('userData', {
-  //       name: name.value,
-  //       code: code.value,
-  //       model: model.value,
-  //       seri: seri.value,
-  //       manufacturer: manufacturer.value,
-  //       datePutIntoUse: datePutIntoUse.value,
-  //       maintenanceHistory: maintenanceHistory.value,
-  //       warrantyInformation: warrantyInformation.value,
-  //     });
-  //     emit('update:isDrawerOpen', false);
-  //     nextTick(() => {
-  //       refForm.value?.reset();
-  //       refForm.value?.resetValidation();
-  //     });
-  //   }
-  //});
+  refForm.value?.validate().then(({ valid }) => {
+    if (valid) {
+      emit('addCategory', formData.value);
+      emit('update:isDrawerOpen', false);
+      nextTick(() => {
+        refForm.value?.reset();
+        refForm.value?.resetValidation();
+      });
+    }
+  });
 };
 
 const handleDrawerModelValueUpdate = (val: boolean) => {
   emit('update:isDrawerOpen', val);
 };
 
-const counter = ref<any[]>([{ name: '' }]);
-
 const addField = () => {
-  counter.value.push({ name: '' });
+  formData.value.fields.push({ name: '' });
 };
 
 const removeField = (index: number) => {
-  counter.value.splice(index, 1);
-}
+  formData.value.fields.splice(index, 1);
+};
 
 </script>
 
@@ -82,33 +77,30 @@ const removeField = (index: number) => {
             <VRow>
               <!-- 👉 Full name -->
               <VCol cols="12">
-                <AppTextField v-model="name" :rules="[requiredValidator]" label="Tên danh mục"
-                  placeholder="Tên danh mục" />
+                <AppTextField :rules="[requiredValidator]" label="Tên danh mục" placeholder="Tên danh mục"
+                  v-model="formData.name" />
               </VCol>
 
               <!-- 👉 code -->
               <VCol cols="12">
                 <label class="v-label mb-1 text-body-2">Ghi chú</label>
-                <TiptapEditor label="Ghi chú" class="border rounded basic-editor" model-value="" />
+                <TiptapEditor label="Ghi chú" class="border rounded basic-editor" v-model="formData.note" />
               </VCol>
-              <template v-for="(field, index) in counter" :key="index">
-                <VCol cols="12">
-                  <VLabel class="d-flex">
-                    <div class="d-flex text-sm justify-space-between w-100">
-                      <div class="text-high-emphasis">
-                        Thêm trường thông tin
-                      </div>
+              <VCol cols="12" v-for="(field, index) in formData.fields" :key="index">
+                <VLabel class="d-flex">
+                  <div class="d-flex text-sm justify-space-between w-100">
+                    <div class="text-high-emphasis">
+                      Thêm trường thông tin
                     </div>
-                  </VLabel>
-                  <div class="d-flex gap-x-4">
-                    <AppTextField v-model="field.name" :rules="[requiredValidator]"
-                      placeholder="Thêm trường thông tin" />
-                    <VBtn v-if="index === counter.length - 1" @click="addField" rounded icon="tabler-plus"
-                      variant="tonal" />
-                    <VBtn v-else @click="() => removeField(index)" rounded icon="tabler-minus" variant="tonal" />
                   </div>
-                </VCol>
-              </template>
+                </VLabel>
+                <div class="d-flex gap-x-4">
+                  <AppTextField v-model="field.name" placeholder="Thêm trường thông tin" />
+                  <VBtn v-if="index === formData.fields.length - 1" @click="addField" rounded icon="tabler-plus"
+                    variant="tonal" />
+                  <VBtn v-else @click="() => removeField(index)" rounded icon="tabler-minus" variant="tonal" />
+                </div>
+              </VCol>
               <!-- 👉 Submit and Cancel -->
               <VCol cols="12">
                 <VBtn type="submit" class="me-3">
