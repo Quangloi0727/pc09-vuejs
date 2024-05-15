@@ -123,6 +123,136 @@ const deleteItemConfirm = async (id: any) => {
 const getUrlImage = (item: any) => {
     return urlImage + '/' + item.type + '/' + item.img_url;
 };
+const items: any[] = [
+    {
+        "id": 1,
+        "title": "Văn bản tài liệu",
+        "format": "Thư mục",
+        "children": [
+            {
+                "id": 2,
+                "title": "Công văn cung cấp mẫu hình dấu,chữ ký",
+                "format": "Thư mục",
+            },
+            {
+                "id": 3,
+                "title": "Thông báo mẫu dấu,chữ ký",
+                "format": "Thư mục",
+            },
+            {
+                "id": 4,
+                "title": "Thông báo thay đổi mẫu dấu,chữ ký",
+                "format": "Thư mục",
+            },
+            {
+                "id": 5,
+                "title": "Biên bản thu mẫu hình dấu,chữ ký",
+                "format": "Thư mục",
+            },
+            {
+                "id": 4,
+                "title": "Tài liệu chứ hình dấu,chữ ký",
+                "format": "Thư mục",
+            },
+            {
+                "id": 4,
+                "title": "Bản cung cấp mẫu hình dấu,chữ ký",
+                "format": "Thư mục",
+            }
+        ]
+    },
+    {
+        "id": 2,
+        "title": "Ấn phẩm",
+        "format": "Thư mục",
+        "children": [
+            {
+                "id": 2,
+                "title": "Ân phẩm trong lĩnh vực tài chính ngân hàng",
+                "format": "Thư mục",
+                "children": [
+                    {
+                        "id": 2,
+                        "title": "Tiền",
+                        "format": "Thư mục",
+                        "children": [
+                            {
+                                "id": 2,
+                                "title": "Tiền hỗn hợp (Hybrid banknote)",
+                                "format": "Thư mục",
+                            },
+                            {
+                                "id": 2,
+                                "title": "Tiền giấy (Paper banknote)",
+                                "format": "Thư mục",
+                            },
+                            {
+                                "id": 2,
+                                "title": "Tiền polyme (Polymer banknote)",
+                                "format": "Thư mục",
+                            },
+                        ]
+                    },
+                ]
+            },
+            {
+                "id": 2,
+                "title": "Ấn phẩm trong lĩnh vực tư pháp",
+                "format": "Thư mục",
+            },
+            {
+                "id": 2,
+                "title": "Ấn phẩm trong lĩnh vực giao thông vận tải",
+                "format": "Thư mục",
+            },
+            {
+                "id": 2,
+                "title": "Ấn phẩm liên quan đến trật tự xã hội",
+                "format": "Thư mục",
+            },
+            {
+                "id": 2,
+                "title": "Ấn phẩm trong lĩnh vực giáo dục và đào tạo",
+                "format": "Thư mục",
+            },
+            {
+                "id": 2,
+                "title": "Ấn phẩm trong lĩnh vực ý tế",
+                "format": "Thư mục",
+            },
+            {
+                "id": 2,
+                "title": "Ấn phẩm trong lĩnh vực kế hoạch và đầu tư",
+                "format": "Thư mục",
+            },
+            {
+                "id": 2,
+                "title": "Ấn phẩm trong lĩnh vực tài nguyên và môi trường",
+                "format": "Thư mục",
+            },
+            {
+                "id": 2,
+                "title": "Ấn phẩm trong lĩnh vực lao động và xã hội",
+                "format": "Thư mục",
+            },
+        ]
+    },
+];
+
+let selectedItems: any = reactive([]);
+const handleSelect = (item: any, level = 0) => {
+    selectedItems.splice(level);
+    if (item && item.children && item.children.length > 0) {
+        selectedItems.push(item);
+    }
+};
+let selectedItemsSearch: any = reactive([]);
+const handleSelectSearch = (item: any, level = 0) => {
+    selectedItemsSearch.splice(level);
+    if (item && item.children && item.children.length > 0) {
+        selectedItemsSearch.push(item);
+    }
+};
 </script>
 
 <template>
@@ -153,10 +283,16 @@ const getUrlImage = (item: any) => {
 
                             <VCol cols="12" md="12">
                                 <AppAutocomplete v-model="formData.type" label="Loại"
-                                    placeholder="--- Chọn loại ảnh ---" :items="listType" clear-icon="tabler-x"
-                                    clearable itemTitle="name" itemValue="id" :rules="[requiredValidator]" />
+                                    placeholder="--- Chọn loại ảnh ---" :items="items" clear-icon="tabler-x" clearable
+                                    :rules="[requiredValidator]" @update:model-value="item => handleSelect(item, 0)"
+                                    return-object />
                             </VCol>
-
+                            <VCol cols="12" md="12" v-for="(childItems, index) in selectedItems" :key="index">
+                                <AppAutocomplete :items="childItems.children" label="Loại"
+                                    placeholder="--- Chọn loại ảnh ---" clear-icon="tabler-x" clearable
+                                    :rules="[requiredValidator]"
+                                    @update:model-value="item => handleSelect(item, index + 1)" return-object />
+                            </VCol>
                             <VCol cols="12" md="12">
                                 <AppAutocomplete v-model="formData.timecreated" label="Loại ảnh giám định/so sánh"
                                     placeholder="--- Chọn loại ảnh ---" :items="typeAppraisalOrCompareSelect"
@@ -200,8 +336,14 @@ const getUrlImage = (item: any) => {
                     <AppTextField v-model="searchAdvance" label="Thông tin ảnh" placeholder="Tìm kiếm theo thông tin" />
                 </VCol>
                 <VCol cols="12" sm="4">
-                    <AppAutocomplete v-model="typeAdvance" label="Loại" placeholder="--- Chọn loại ảnh ---"
-                        :items="listType" clear-icon="tabler-x" clearable itemTitle="name" itemValue="id" />
+                    <AppAutocomplete label="Loại" placeholder="--- Chọn loại ảnh ---" :items="items"
+                        clear-icon="tabler-x" clearable @update:model-value="item => handleSelectSearch(item, 0)"
+                        return-object />
+                </VCol>
+                <VCol cols="12" md="4" v-for="(childItemsSearch, index) in selectedItemsSearch" :key="index">
+                    <AppAutocomplete :items="childItemsSearch.children" label="Loại" placeholder="--- Chọn loại ảnh ---"
+                        clear-icon="tabler-x" clearable
+                        @update:model-value="item => handleSelectSearch(item, index + 1)" return-object />
                 </VCol>
                 <VCol cols="12" sm="4">
                     <AppAutocomplete v-model="timeCreatedAdvance" label="Loại ảnh giám định/so sánh"
