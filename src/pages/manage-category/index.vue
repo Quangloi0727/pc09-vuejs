@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import AddNewCategory from "@/views/manage-category/add-category.vue";
+import EditNewCategory from "@/views/manage-category/edit-category.vue";
 const header = [{
     "title": "Tên thư mục",
     "format": "Đinh dạng",
@@ -120,20 +121,37 @@ const items: any[] = [
         ]
     },
 ];
-let showForm = ref<boolean>(false);
+let showFormAdd = ref<boolean>(false);
+let showFormEdit = ref<boolean>(false);
+let dataEdit = ref();
 const computedMoreList = computed(() => {
-    return (paramId: number) => ([
-        { title: 'Thêm mới', prependIcon: 'tabler-plus', value: "add", onClick: () => { showForm.value = true; } },
+    return (item: any) => ([
+        { title: 'Thêm mới', prependIcon: 'tabler-plus', value: "add", onClick: () => { showFormAdd.value = true; } },
         {
             title: 'Sửa',
             prependIcon: 'tabler-pencil',
-            value: "edit"
-            // to: { name: 'apps-invoice-edit-id', params: { id: paramId } },
+            value: "edit",
+            onClick: () => {
+                showFormEdit.value = true;
+                dataEdit.value = item;
+            }
         },
-        { title: 'Xóa', prependIcon: 'tabler-trash', value: "delete" },
+        {
+            title: 'Xóa', prependIcon: 'tabler-trash', value: "delete", onClick: () => {
+                deleteDialog.value = true;
+                deleteItem.value = item;
+            }
+        },
     ]);
 });
-
+const deleteItem: any = ref();
+const deleteDialog = ref<boolean>(false);
+const closeDelete = () => {
+    deleteDialog.value = false;
+};
+const deleteItemConfirm = async (id: any) => {
+    closeDelete();
+};
 </script>
 
 <template>
@@ -180,7 +198,7 @@ const computedMoreList = computed(() => {
                                 {{ item.format }}
                             </v-col>
                             <v-col cols="2">
-                                <MoreBtn :menu-list="computedMoreList(item.id)" item-props />
+                                <MoreBtn :menu-list="computedMoreList(item)" item-props />
                             </v-col>
                             <!-- Actions -->
                         </v-row>
@@ -192,5 +210,28 @@ const computedMoreList = computed(() => {
             </v-lazy>
         </template>
     </VCard>
-    <AddNewCategory v-model:isDrawerOpen="showForm" />
+    <AddNewCategory v-model:isDrawerOpen="showFormAdd" v-if="showFormAdd" />
+    <EditNewCategory v-model:isDrawerOpen="showFormEdit" :data="dataEdit" v-if="showFormEdit" />
+    <!-- 👉 Delete Dialog  -->
+    <VDialog v-model="deleteDialog" max-width="500px">
+        <VCard>
+            <VCardTitle class="d-block font-weight-regular text-wrap">
+                Bản ghi {{ deleteItem.title }} sẽ được xóa ?
+            </VCardTitle>
+
+            <VCardActions>
+                <VSpacer />
+
+                <VBtn color="error" variant="outlined" @click="closeDelete">
+                    Hủy
+                </VBtn>
+
+                <VBtn color="success" variant="elevated" @click="deleteItemConfirm(deleteItem.id)">
+                    Xác nhận
+                </VBtn>
+
+                <VSpacer />
+            </VCardActions>
+        </VCard>
+    </VDialog>
 </template>
