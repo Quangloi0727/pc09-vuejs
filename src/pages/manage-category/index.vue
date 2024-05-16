@@ -6,127 +6,18 @@ const header = [{
     "format": "Đinh dạng",
     "action": "Thao tác",
 }];
-const items: any[] = [
-    {
-        "id": 1,
-        "title": "Văn bản tài liệu",
-        "format": "Thư mục",
-        "children": [
-            {
-                "id": 2,
-                "title": "Công văn cung cấp mẫu hình dấu,chữ ký",
-                "format": "Thư mục",
-            },
-            {
-                "id": 3,
-                "title": "Thông báo mẫu dấu,chữ ký",
-                "format": "Thư mục",
-            },
-            {
-                "id": 4,
-                "title": "Thông báo thay đổi mẫu dấu,chữ ký",
-                "format": "Thư mục",
-            },
-            {
-                "id": 5,
-                "title": "Biên bản thu mẫu hình dấu,chữ ký",
-                "format": "Thư mục",
-            },
-            {
-                "id": 4,
-                "title": "Tài liệu chứ hình dấu,chữ ký",
-                "format": "Thư mục",
-            },
-            {
-                "id": 4,
-                "title": "Bản cung cấp mẫu hình dấu,chữ ký",
-                "format": "Thư mục",
-            }
-        ]
-    },
-    {
-        "id": 2,
-        "title": "Ấn phẩm",
-        "format": "Thư mục",
-        "children": [
-            {
-                "id": 2,
-                "title": "Ân phẩm trong lĩnh vực tài chính ngân hàng",
-                "format": "Thư mục",
-                "children": [
-                    {
-                        "id": 2,
-                        "title": "Tiền",
-                        "format": "Thư mục",
-                        "children": [
-                            {
-                                "id": 2,
-                                "title": "Tiền hỗn hợp (Hybrid banknote)",
-                                "format": "Thư mục",
-                            },
-                            {
-                                "id": 2,
-                                "title": "Tiền giấy (Paper banknote)",
-                                "format": "Thư mục",
-                            },
-                            {
-                                "id": 2,
-                                "title": "Tiền polyme (Polymer banknote)",
-                                "format": "Thư mục",
-                            },
-                        ]
-                    },
-                ]
-            },
-            {
-                "id": 2,
-                "title": "Ấn phẩm trong lĩnh vực tư pháp",
-                "format": "Thư mục",
-            },
-            {
-                "id": 2,
-                "title": "Ấn phẩm trong lĩnh vực giao thông vận tải",
-                "format": "Thư mục",
-            },
-            {
-                "id": 2,
-                "title": "Ấn phẩm liên quan đến trật tự xã hội",
-                "format": "Thư mục",
-            },
-            {
-                "id": 2,
-                "title": "Ấn phẩm trong lĩnh vực giáo dục và đào tạo",
-                "format": "Thư mục",
-            },
-            {
-                "id": 2,
-                "title": "Ấn phẩm trong lĩnh vực ý tế",
-                "format": "Thư mục",
-            },
-            {
-                "id": 2,
-                "title": "Ấn phẩm trong lĩnh vực kế hoạch và đầu tư",
-                "format": "Thư mục",
-            },
-            {
-                "id": 2,
-                "title": "Ấn phẩm trong lĩnh vực tài nguyên và môi trường",
-                "format": "Thư mục",
-            },
-            {
-                "id": 2,
-                "title": "Ấn phẩm trong lĩnh vực lao động và xã hội",
-                "format": "Thư mục",
-            },
-        ]
-    },
-];
 let showFormAdd = ref<boolean>(false);
 let showFormEdit = ref<boolean>(false);
 let dataEdit = ref();
+let parentId = ref();
 const computedMoreList = computed(() => {
     return (item: any) => ([
-        { title: 'Thêm mới', prependIcon: 'tabler-plus', value: "add", onClick: () => { showFormAdd.value = true; } },
+        {
+            title: 'Thêm mới', prependIcon: 'tabler-plus', value: "add", onClick: () => {
+                showFormAdd.value = true;
+                parentId.value = item._id;
+            }
+        },
         {
             title: 'Sửa',
             prependIcon: 'tabler-pencil',
@@ -134,6 +25,7 @@ const computedMoreList = computed(() => {
             onClick: () => {
                 showFormEdit.value = true;
                 dataEdit.value = item;
+                parentId.value = item._id;
             }
         },
         {
@@ -149,12 +41,46 @@ const deleteDialog = ref<boolean>(false);
 const closeDelete = () => {
     deleteDialog.value = false;
 };
-const deleteItemConfirm = async (id: any) => {
+const deleteItemConfirm = async (_id: any) => {
+    await $fetchApiAiService(`manage-category/${_id}/delete`, {
+        method: 'DELETE',
+    });
     closeDelete();
+    fetchData();
+};
+
+const { data: listData, execute: fetchData } = await useApiFetchAiService<any>(createUrl('/manage-category/getList'));
+const items: any = computed(() => listData.value.data);
+
+const addCategory = async (data: any) => {
+    await $fetchApiAiService(`manage-category/create`, {
+        method: 'POST',
+        body: data,
+    });
+    fetchData();
+};
+const editCategory = async (data: any) => {
+    const _id = data.parentId;
+    delete data.parentId;
+    await $fetchApiAiService(`manage-category/${_id}/update`, {
+        method: 'PUT',
+        body: data,
+    });
+    fetchData();
 };
 </script>
 
 <template>
+    <div class="d-flex flex-wrap gap-4 ma-6">
+        <VSpacer />
+        <div class="d-flex gap-4 flex-wrap align-center">
+            <VBtn color="primary" prepend-icon="tabler-plus" @click="() => { showFormAdd = true; }">
+                Thêm danh mục
+            </VBtn>
+        </div>
+    </div>
+
+    <VDivider class="mt-4" />
     <VCard>
         <template v-for="(element, i) in header" :key="i">
             <v-lazy :options="{
@@ -185,17 +111,18 @@ const deleteItemConfirm = async (id: any) => {
             <v-lazy :options="{
                 threshold: 0.25,
             }" :min-height="50" transition="scroll-x-reverse-transition">
-                <v-treeview collapseIcon="tabler-minus" expandIcon="tabler-plus" :items="[element]">
+                <v-treeview collapseIcon="tabler-minus" expandIcon="tabler-plus" :items="[element]"
+                    itemChildren="childrenIds">
                     <template #title="{ item }">
                         <v-row align="center">
                             <!-- Title -->
                             <v-col cols="8">
-                                {{ item.title }}
+                                {{ item.name }}
                             </v-col>
                             <v-spacer />
                             <!-- Other columns -->
                             <v-col cols="2">
-                                {{ item.format }}
+                                Thư mục
                             </v-col>
                             <v-col cols="2">
                                 <MoreBtn :menu-list="computedMoreList(item)" item-props />
@@ -204,14 +131,16 @@ const deleteItemConfirm = async (id: any) => {
                         </v-row>
                     </template>
                     <template #prepend="{ item }">
-                        <VIcon size="12" v-if="!item.children" />
+                        <VIcon size="12" v-if="!item.childrenIds" />
                     </template>
                 </v-treeview>
             </v-lazy>
         </template>
     </VCard>
-    <AddNewCategory v-model:isDrawerOpen="showFormAdd" v-if="showFormAdd" />
-    <EditNewCategory v-model:isDrawerOpen="showFormEdit" :data="dataEdit" v-if="showFormEdit" />
+    <AddNewCategory v-model:isDrawerOpen="showFormAdd" :parentId="parentId" v-if="showFormAdd"
+        @add-category="addCategory" />
+    <EditNewCategory v-model:isDrawerOpen="showFormEdit" :data="dataEdit" :parentId="parentId" v-if="showFormEdit"
+        @edit-category="editCategory" />
     <!-- 👉 Delete Dialog  -->
     <VDialog v-model="deleteDialog" max-width="500px">
         <VCard>
@@ -226,7 +155,7 @@ const deleteItemConfirm = async (id: any) => {
                     Hủy
                 </VBtn>
 
-                <VBtn color="success" variant="elevated" @click="deleteItemConfirm(deleteItem.id)">
+                <VBtn color="success" variant="elevated" @click="deleteItemConfirm(deleteItem._id)">
                     Xác nhận
                 </VBtn>
 
