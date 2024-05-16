@@ -44,6 +44,10 @@ const closeDelete = () => {
 const deleteItemConfirm = async (_id: any) => {
     await $fetchApiAiService(`manage-category/${_id}/delete`, {
         method: 'DELETE',
+    }).catch(err => {
+        alert(err);
+        closeDelete();
+        return;
     });
     closeDelete();
     fetchData();
@@ -74,7 +78,10 @@ const editCategory = async (data: any) => {
     <div class="d-flex flex-wrap gap-4 ma-6">
         <VSpacer />
         <div class="d-flex gap-4 flex-wrap align-center">
-            <VBtn color="primary" prepend-icon="tabler-plus" @click="() => { showFormAdd = true; }">
+            <VBtn color="primary" prepend-icon="tabler-plus" @click="() => {
+                showFormAdd = true;
+                parentId = null;
+            }">
                 Thêm danh mục
             </VBtn>
         </div>

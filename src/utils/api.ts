@@ -37,4 +37,7 @@ export const $fetchApiAiService = ofetch.create({
       };
     }
   },
+  async onResponseError({ response }) {
+    throw new Error(response?._data?.message || 'An error occurred');
+  },
 });
