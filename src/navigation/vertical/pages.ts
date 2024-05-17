@@ -17,10 +17,11 @@ export default [
     ],
   },
   {
-    title: 'Tra cứu thông tin',
+    title: 'Quản lý tàng thư dấu vết hình sự',
     icon: { icon: 'tabler-database-search' },
     children: [
-      { title: 'Tàng thư dấu vết hình sự', to: 'manage-criminal-trace-general' },
+      { title: 'Tra cứu dữ liệu', to: 'manage-criminal-trace', icon: { icon: 'tabler-search' } },
+      { title: 'Cập nhật dữ liệu', to: 'manage-criminal-trace-new', icon: { icon: 'tabler-edit-circle' } },
     ],
   },
   {

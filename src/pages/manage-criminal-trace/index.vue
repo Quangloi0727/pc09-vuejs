@@ -10,11 +10,10 @@ const formData: any = ref({
     timecreated: null
 });
 const currentTab = ref('item-1');
-const sourceImage = ref("");
 const editDialog = ref(false);
 const editedItem: any = ref(formData.value);
-let selectedItems: any = reactive([]);
 const deleteDialog = ref(false);
+let selectedItems: any = reactive([]);
 
 const formTable = ref({
     data: [],
@@ -25,6 +24,7 @@ const formSearchNormal = ref({
     typeSearch: "normal",
     search: '',
     timeCreated: undefined,
+    category: ''
 });
 interface FormImage {
     image: string;
@@ -60,10 +60,10 @@ const fetchData = async (searchNormal?: any, searchImage?: any) => {
     };
 
     if (searchNormal) {
-        const { typeSearch, timeCreated, search } = searchNormal.value;
+        const { typeSearch, timeCreated, search, category } = searchNormal.value;
 
         if (typeSearch == "normal") {
-            body = { ...body, search, timeCreated, typeSearch };
+            body = { ...body, search, timeCreated, typeSearch, category };
         }
     }
 
@@ -83,19 +83,6 @@ const fetchData = async (searchNormal?: any, searchImage?: any) => {
 };
 fetchData();
 
-const showImage = (file: Event) => {
-    const fileReader = new FileReader();
-    const { files } = file.target as HTMLInputElement;
-
-    if (files && files.length) {
-        fileReader.readAsDataURL(files[0]);
-        fileReader.onload = () => {
-            if (typeof fileReader.result === 'string') {
-                sourceImage.value = fileReader.result;
-            }
-        };
-    }
-};
 const getValueImageSearch = (file: Event) => {
     const fileReader = new FileReader();
     const { files } = file.target as HTMLInputElement;
@@ -110,9 +97,6 @@ const getValueImageSearch = (file: Event) => {
         };
     }
 };
-const handleRemoveFile = () => {
-    sourceImage.value = "";
-};
 const handleRemoveFileSearch = () => {
     formSearchImage.value.image = "";
 };
@@ -121,17 +105,6 @@ const typeAppraisalOrCompareSelect = [
     { title: "Ảnh giám định", value: "0" },
     { title: "Ảnh so sánh", value: "1" },
 ];
-
-const onSubmit = async () => {
-    if (sourceImage.value != "") {
-        const imageBinary = sourceImage.value.split(',');
-        formData.value.image = imageBinary[1];
-    }
-    await $fetchApiAiService('/sample/import', {
-        method: 'POST',
-        body: formData.value,
-    });
-};
 
 // 👉 methods
 const editItem = (item: any) => {
@@ -174,22 +147,7 @@ const deleteItemConfirm = async (id: any) => {
 const getUrlImage = (item: any) => {
     return urlImage + '/' + item.type + '/' + item.img_url;
 };
-const { data: listCategory } = await useApiFetchAiService<any>(createUrl('/manage-category/getList'));
-const items: any = computed(() => listCategory.value.data);
 
-const handleSelect = (item: any, level = 0) => {
-    formData.value.type = item._id;
-    selectedItems.splice(level);
-    if (item && item.childrenIds && item.childrenIds.length > 0) {
-        selectedItems.push(item);
-    }
-    if (item && item.fields && item.fields.length > 0) {
-        const filteredItems = item.fields.filter((el: any) => el.name.trim() !== '');
-        formData.value.fields = filteredItems;
-    } else {
-        formData.value.fields = [];
-    }
-};
 const printTypeText = (item: any) => {
     if (item && item.fields && item.fields.length) {
         const valuesArray = item.fields.map((el: any) => el.value);
@@ -213,79 +171,36 @@ const handleSelectPageSize = () => {
         fetchData(undefined, formSearchImage);
     };
 };
+const { data: listCategory } = await useApiFetchAiService<any>(createUrl('/manage-category/getList'));
+const items: any = computed(() => listCategory.value.data);
+
+const handleSelect = (item: any, level = 0) => {
+    if (item) {
+        formSearchNormal.value.category = item._id;
+        formData.value.type = item._id;
+        selectedItems.splice(level);
+        if (item && item.childrenIds && item.childrenIds.length > 0) {
+            selectedItems.push(item);
+        }
+        if (item && item.fields && item.fields.length > 0) {
+            const filteredItems = item.fields.filter((el: any) => el.name.trim() !== '');
+            formData.value.fields = filteredItems;
+        } else {
+            formData.value.fields = [];
+        }
+    } else {
+        selectedItems.splice(level);
+        const lastItemSelected = selectedItems[selectedItems.length - 1];
+        if (lastItemSelected) {
+            formSearchNormal.value.category = lastItemSelected._id;
+        } else {
+            formSearchNormal.value.category = '';
+        }
+    }
+};
 </script>
 
 <template>
-    <VCard class="overflow-visible">
-        <VCardText>
-            <VRow>
-                <VCol md="7" cols="12" class="mx-auto">
-                    <VForm @submit.prevent="onSubmit">
-                        <h5 class="text-h6 mb-6">
-                            Thêm ảnh tra cứu
-                        </h5>
-                        <VRow>
-                            <VCol cols="12" md="12">
-                                <VFileInput label="Chọn ảnh tra cứu" accept="image/png, image/jpeg, image/bmp"
-                                    prepend-icon="tabler-camera" @input="showImage" @click:clear="handleRemoveFile()"
-                                    :rules="[requiredValidator]" />
-                            </VCol>
-
-                            <VCol cols="12" md="12">
-                                <AppTextField v-model="formData.info" label="Thông tin" placeholder="Nhập..."
-                                    :rules="[requiredValidator]" />
-                            </VCol>
-                            <VCol cols="12" md="12">
-                                <AppAutocomplete label="Loại" placeholder="--- Chọn loại ảnh ---" :items="items"
-                                    clear-icon="tabler-x" clearable itemTitle="name" :rules="[requiredValidator]"
-                                    @update:model-value="item => handleSelect(item, 0)" return-object />
-                            </VCol>
-                            <VCol cols="12" md="12" v-for="(childItems, index) in selectedItems" :key="index">
-                                <AppAutocomplete :items="childItems.childrenIds" label="Loại"
-                                    placeholder="--- Chọn loại ảnh ---" clear-icon="tabler-x" clearable
-                                    :rules="[requiredValidator]" itemTitle="name"
-                                    @update:model-value="item => handleSelect(item, index + 1)" return-object />
-                            </VCol>
-                            <VCol cols="12" md="6" v-for="(field, index) in formData.fields" :key="index"
-                                v-if="formData.fields.length > 0">
-                                <AppTextField v-model="field.value" :label="field.name" placeholder="Nhập..."
-                                    :rules="[requiredValidator]" />
-                            </VCol>
-                            <VCol cols="12" md="12">
-                                <AppAutocomplete v-model="formData.timecreated" label="Loại ảnh giám định/so sánh"
-                                    placeholder="--- Chọn loại ảnh ---" :items="typeAppraisalOrCompareSelect"
-                                    clear-icon="tabler-x" clearable :rules="[requiredValidator]" />
-                            </VCol>
-                            <VCol cols="12" md="12" class="d-flex gap-4">
-                                <VBtn type="submit">
-                                    Nhập thông tin
-                                </VBtn>
-                            </VCol>
-
-                        </VRow>
-                    </VForm>
-                </VCol>
-                <VCol md="5" cols="12" class="mx-auto">
-                    <VCard class="overflow-visible mt-15">
-                        <VCardText class="d-flex">
-                            <VImg v-if="sourceImage !== ''" :src="sourceImage" width="300" height="300"
-                                class="w-100 mx-auto" />
-                            <div v-else
-                                class="d-flex flex-column justify-center align-center gap-y-6 pa-6 drop-zone rounded">
-                                <IconBtn variant="tonal" class="rounded-sm">
-                                    <VIcon icon="tabler-photo-filled" />
-                                </IconBtn>
-                                <VBtn variant="tonal" size="small">
-                                    Vui lòng chọn ảnh để hiện thị preview
-                                </VBtn>
-                            </div>
-                        </VCardText>
-                    </VCard>
-                </VCol>
-            </VRow>
-        </VCardText>
-    </VCard>
-
     <!-- 👉 products -->
     <VCard title="Bộ lọc" class="overflow-visible mt-10">
         <VCard>
@@ -307,7 +222,17 @@ const handleSelectPageSize = () => {
                                     label="Loại ảnh giám định/so sánh" placeholder="--- Chọn loại ảnh ---"
                                     :items="typeAppraisalOrCompareSelect" clear-icon="tabler-x" clearable />
                             </VCol>
-                            <VCol cols="12" offset-sm="1" sm="2">
+                            <VCol cols="12" md="4">
+                                <AppAutocomplete label="Loại" placeholder="--- Chọn loại ảnh ---" :items="items"
+                                    clear-icon="tabler-x" clearable itemTitle="name"
+                                    @update:model-value="item => handleSelect(item, 0)" return-object />
+                            </VCol>
+                            <VCol cols="12" md="4" v-for="(childItems, index) in selectedItems" :key="index">
+                                <AppAutocomplete :items="childItems.childrenIds" label="Loại"
+                                    placeholder="--- Chọn loại ảnh ---" clear-icon="tabler-x" clearable itemTitle="name"
+                                    @update:model-value="item => handleSelect(item, index + 1)" return-object />
+                            </VCol>
+                            <VCol cols="12" sm="2">
                                 <VBtn class="mt-6" @click="searchNormal">
                                     <VIcon start icon="tabler-search" />Tìm kiếm
                                 </VBtn>
