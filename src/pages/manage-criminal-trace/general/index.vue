@@ -4,47 +4,85 @@ const itemsPerPage = ref(10);
 const page = ref(1);
 const formData: any = ref({
     info: '',
-    code: '',
+    code: 'Default',
     type: null,
+    fields: [],
     timecreated: null
 });
-const searchAdvance = ref();
-const typeAdvance = ref();
-const timeCreatedAdvance = ref();
+const currentTab = ref('item-1');
+const sourceImage = ref("");
+const editDialog = ref(false);
+const editedItem: any = ref(formData.value);
+let selectedItems: any = reactive([]);
+const deleteDialog = ref(false);
+
+const formTable = ref({
+    data: [],
+    totalData: 0,
+});
+
+const formSearchNormal = ref({
+    typeSearch: "normal",
+    search: '',
+    timeCreated: undefined,
+});
+interface FormImage {
+    image: string;
+    main_threshold: number;
+    typeSearch: string;
+}
+
+const formSearchImage = ref<FormImage>({
+    typeSearch: "image",
+    image: '',
+    main_threshold: 70,
+});
+
+const urlImage = import.meta.env.VITE_API_BASE_URL_IMAGE;
 
 // Headers
 const headers = [
     { title: '#', key: 'index', sortable: false },
     { title: 'Ảnh', key: 'image', sortable: false },
     { title: 'Thông tin', key: 'info', sortable: false },
-    { title: 'Đường dẫn', key: 'img_url', sortable: false },
     { title: 'Loại', key: 'typeText', sortable: false },
     { title: 'GD/SS', key: 'timeCreatedText', sortable: false },
-    { title: 'Thông tin người nhập', key: 'code', sortable: false },
     { title: 'Actions', key: 'actions', sortable: false },
 ];
 
 const { data: listDataType } = await useApiFetchConfigService<any>(createUrl('/type-image/get-all'));
 const listType = computed(() => listDataType.value.data);
 
-const { data: listDataTable, execute: fetchData } = await useApiFetchAiService<any>(createUrl('/sample/get-list',
-    {
-        query: {
-            page,
-            limit: itemsPerPage,
-            type: typeAdvance,
-            search: searchAdvance,
-            timeCreated: timeCreatedAdvance,
-        },
-    },
-));
+const fetchData = async (searchNormal?: any, searchImage?: any) => {
+    let body: any = {
+        page: page.value,
+        limit: itemsPerPage.value,
+    };
 
-const listData = computed(() => listDataTable.value.data.data);
-const totalData = computed(() => listDataTable.value.data.recordsTotal);
+    if (searchNormal) {
+        const { typeSearch, timeCreated, search } = searchNormal.value;
 
-const urlImage = import.meta.env.VITE_API_BASE_URL_IMAGE;
+        if (typeSearch == "normal") {
+            body = { ...body, search, timeCreated, typeSearch };
+        }
+    }
 
-const sourceImage = ref("");
+    if (searchImage) {
+        const { typeSearch, image, main_threshold } = searchImage.value;
+        if (typeSearch == "image") {
+            body = { ...body, image, main_threshold, typeSearch };
+        }
+    }
+
+    const { data } = await $fetchApiAiService('/sample/search', {
+        method: 'POST',
+        body: body,
+    });
+    formTable.value.data = data.data;
+    formTable.value.totalData = data.recordsTotal;
+};
+fetchData();
+
 const showImage = (file: Event) => {
     const fileReader = new FileReader();
     const { files } = file.target as HTMLInputElement;
@@ -58,8 +96,25 @@ const showImage = (file: Event) => {
         };
     }
 };
+const getValueImageSearch = (file: Event) => {
+    const fileReader = new FileReader();
+    const { files } = file.target as HTMLInputElement;
+
+    if (files && files.length) {
+        fileReader.readAsDataURL(files[0]);
+        fileReader.onload = () => {
+            if (typeof fileReader.result === 'string') {
+                const imageBinary = fileReader.result.split(',');
+                formSearchImage.value.image = imageBinary[1];
+            }
+        };
+    }
+};
 const handleRemoveFile = () => {
     sourceImage.value = "";
+};
+const handleRemoveFileSearch = () => {
+    formSearchImage.value.image = "";
 };
 
 const typeAppraisalOrCompareSelect = [
@@ -72,14 +127,12 @@ const onSubmit = async () => {
         const imageBinary = sourceImage.value.split(',');
         formData.value.image = imageBinary[1];
     }
-    await $fetchApiImageService('/import', {
+    await $fetchApiAiService('/sample/import', {
         method: 'POST',
         body: formData.value,
     });
-    fetchData();
 };
-const editDialog = ref(false);
-const editedItem: any = ref(formData.value);
+
 // 👉 methods
 const editItem = (item: any) => {
     editedItem.value = { ...item };
@@ -89,6 +142,7 @@ const editItem = (item: any) => {
 const close = () => {
     editDialog.value = false;
 };
+
 const save = async (id: any) => {
     await $fetchApiAiService('/sample/edit', {
         method: 'PUT',
@@ -101,10 +155,8 @@ const save = async (id: any) => {
         },
     });
     close();
-    fetchData();
 };
 
-const deleteDialog = ref(false);
 const deleteItem = (item: any) => {
     editedItem.value = { ...item };
     deleteDialog.value = true;
@@ -118,140 +170,48 @@ const deleteItemConfirm = async (id: any) => {
 
     });
     closeDelete();
-    fetchData();
 };
 const getUrlImage = (item: any) => {
     return urlImage + '/' + item.type + '/' + item.img_url;
 };
-const items: any[] = [
-    {
-        "id": 1,
-        "title": "Văn bản tài liệu",
-        "format": "Thư mục",
-        "children": [
-            {
-                "id": 2,
-                "title": "Công văn cung cấp mẫu hình dấu,chữ ký",
-                "format": "Thư mục",
-            },
-            {
-                "id": 3,
-                "title": "Thông báo mẫu dấu,chữ ký",
-                "format": "Thư mục",
-            },
-            {
-                "id": 4,
-                "title": "Thông báo thay đổi mẫu dấu,chữ ký",
-                "format": "Thư mục",
-            },
-            {
-                "id": 5,
-                "title": "Biên bản thu mẫu hình dấu,chữ ký",
-                "format": "Thư mục",
-            },
-            {
-                "id": 4,
-                "title": "Tài liệu chứ hình dấu,chữ ký",
-                "format": "Thư mục",
-            },
-            {
-                "id": 4,
-                "title": "Bản cung cấp mẫu hình dấu,chữ ký",
-                "format": "Thư mục",
-            }
-        ]
-    },
-    {
-        "id": 2,
-        "title": "Ấn phẩm",
-        "format": "Thư mục",
-        "children": [
-            {
-                "id": 2,
-                "title": "Ân phẩm trong lĩnh vực tài chính ngân hàng",
-                "format": "Thư mục",
-                "children": [
-                    {
-                        "id": 2,
-                        "title": "Tiền",
-                        "format": "Thư mục",
-                        "children": [
-                            {
-                                "id": 2,
-                                "title": "Tiền hỗn hợp (Hybrid banknote)",
-                                "format": "Thư mục",
-                            },
-                            {
-                                "id": 2,
-                                "title": "Tiền giấy (Paper banknote)",
-                                "format": "Thư mục",
-                            },
-                            {
-                                "id": 2,
-                                "title": "Tiền polyme (Polymer banknote)",
-                                "format": "Thư mục",
-                            },
-                        ]
-                    },
-                ]
-            },
-            {
-                "id": 2,
-                "title": "Ấn phẩm trong lĩnh vực tư pháp",
-                "format": "Thư mục",
-            },
-            {
-                "id": 2,
-                "title": "Ấn phẩm trong lĩnh vực giao thông vận tải",
-                "format": "Thư mục",
-            },
-            {
-                "id": 2,
-                "title": "Ấn phẩm liên quan đến trật tự xã hội",
-                "format": "Thư mục",
-            },
-            {
-                "id": 2,
-                "title": "Ấn phẩm trong lĩnh vực giáo dục và đào tạo",
-                "format": "Thư mục",
-            },
-            {
-                "id": 2,
-                "title": "Ấn phẩm trong lĩnh vực ý tế",
-                "format": "Thư mục",
-            },
-            {
-                "id": 2,
-                "title": "Ấn phẩm trong lĩnh vực kế hoạch và đầu tư",
-                "format": "Thư mục",
-            },
-            {
-                "id": 2,
-                "title": "Ấn phẩm trong lĩnh vực tài nguyên và môi trường",
-                "format": "Thư mục",
-            },
-            {
-                "id": 2,
-                "title": "Ấn phẩm trong lĩnh vực lao động và xã hội",
-                "format": "Thư mục",
-            },
-        ]
-    },
-];
+const { data: listCategory } = await useApiFetchAiService<any>(createUrl('/manage-category/getList'));
+const items: any = computed(() => listCategory.value.data);
 
-let selectedItems: any = reactive([]);
 const handleSelect = (item: any, level = 0) => {
+    formData.value.type = item._id;
     selectedItems.splice(level);
-    if (item && item.children && item.children.length > 0) {
+    if (item && item.childrenIds && item.childrenIds.length > 0) {
         selectedItems.push(item);
     }
-};
-let selectedItemsSearch: any = reactive([]);
-const handleSelectSearch = (item: any, level = 0) => {
-    selectedItemsSearch.splice(level);
-    if (item && item.children && item.children.length > 0) {
-        selectedItemsSearch.push(item);
+    if (item && item.fields && item.fields.length > 0) {
+        const filteredItems = item.fields.filter((el: any) => el.name.trim() !== '');
+        formData.value.fields = filteredItems;
+    } else {
+        formData.value.fields = [];
     }
+};
+const printTypeText = (item: any) => {
+    if (item && item.fields && item.fields.length) {
+        const valuesArray = item.fields.map((el: any) => el.value);
+        const result = valuesArray.join(',');
+        return result;
+    } else {
+        return '';
+    }
+};
+const searchNormal = () => {
+    fetchData(formSearchNormal);
+};
+const searchImage = () => {
+    fetchData(undefined, formSearchImage);
+};
+const handleSelectPageSize = () => {
+    if (currentTab.value == '0') {
+        fetchData(formSearchNormal);
+    }
+    if (currentTab.value == '1') {
+        fetchData(undefined, formSearchImage);
+    };
 };
 </script>
 
@@ -275,23 +235,21 @@ const handleSelectSearch = (item: any, level = 0) => {
                                 <AppTextField v-model="formData.info" label="Thông tin" placeholder="Nhập..."
                                     :rules="[requiredValidator]" />
                             </VCol>
-
                             <VCol cols="12" md="12">
-                                <AppTextField v-model="formData.code" label="Thông tin người nhập" placeholder="Nhập..."
-                                    :rules="[requiredValidator]" />
-                            </VCol>
-
-                            <VCol cols="12" md="12">
-                                <AppAutocomplete v-model="formData.type" label="Loại"
-                                    placeholder="--- Chọn loại ảnh ---" :items="items" clear-icon="tabler-x" clearable
-                                    :rules="[requiredValidator]" @update:model-value="item => handleSelect(item, 0)"
-                                    return-object />
+                                <AppAutocomplete label="Loại" placeholder="--- Chọn loại ảnh ---" :items="items"
+                                    clear-icon="tabler-x" clearable itemTitle="name" :rules="[requiredValidator]"
+                                    @update:model-value="item => handleSelect(item, 0)" return-object />
                             </VCol>
                             <VCol cols="12" md="12" v-for="(childItems, index) in selectedItems" :key="index">
-                                <AppAutocomplete :items="childItems.children" label="Loại"
+                                <AppAutocomplete :items="childItems.childrenIds" label="Loại"
                                     placeholder="--- Chọn loại ảnh ---" clear-icon="tabler-x" clearable
-                                    :rules="[requiredValidator]"
+                                    :rules="[requiredValidator]" itemTitle="name"
                                     @update:model-value="item => handleSelect(item, index + 1)" return-object />
+                            </VCol>
+                            <VCol cols="12" md="6" v-for="(field, index) in formData.fields" :key="index"
+                                v-if="formData.fields.length > 0">
+                                <AppTextField v-model="field.value" :label="field.name" placeholder="Nhập..."
+                                    :rules="[requiredValidator]" />
                             </VCol>
                             <VCol cols="12" md="12">
                                 <AppAutocomplete v-model="formData.timecreated" label="Loại ảnh giám định/so sánh"
@@ -330,42 +288,67 @@ const handleSelectSearch = (item: any, level = 0) => {
 
     <!-- 👉 products -->
     <VCard title="Bộ lọc" class="overflow-visible mt-10">
-        <VCardText>
-            <VRow>
-                <VCol cols="12" sm="4">
-                    <AppTextField v-model="searchAdvance" label="Thông tin ảnh" placeholder="Tìm kiếm theo thông tin" />
-                </VCol>
-                <VCol cols="12" sm="4">
-                    <AppAutocomplete label="Loại" placeholder="--- Chọn loại ảnh ---" :items="items"
-                        clear-icon="tabler-x" clearable @update:model-value="item => handleSelectSearch(item, 0)"
-                        return-object />
-                </VCol>
-                <VCol cols="12" md="4" v-for="(childItemsSearch, index) in selectedItemsSearch" :key="index">
-                    <AppAutocomplete :items="childItemsSearch.children" label="Loại" placeholder="--- Chọn loại ảnh ---"
-                        clear-icon="tabler-x" clearable
-                        @update:model-value="item => handleSelectSearch(item, index + 1)" return-object />
-                </VCol>
-                <VCol cols="12" sm="4">
-                    <AppAutocomplete v-model="timeCreatedAdvance" label="Loại ảnh giám định/so sánh"
-                        placeholder="--- Chọn loại ảnh ---" :items="typeAppraisalOrCompareSelect" clear-icon="tabler-x"
-                        clearable />
-                </VCol>
-            </VRow>
-        </VCardText>
+        <VCard>
+            <VTabs v-model="currentTab">
+                <VTab>Tra cứu thông tin</VTab>
+                <VTab>Tra cứu hình ảnh</VTab>
+            </VTabs>
+
+            <VCardText>
+                <VWindow v-model="currentTab">
+                    <VWindowItem v-for="item in 2" :key="item" :value="`item-${item}`">
+                        <VRow v-if="item === 1">
+                            <VCol cols="12" sm="4">
+                                <AppTextField v-model="formSearchNormal.search" label="Thông tin ảnh"
+                                    placeholder="Tìm kiếm theo thông tin" />
+                            </VCol>
+                            <VCol cols="12" sm="4">
+                                <AppAutocomplete v-model="formSearchNormal.timeCreated"
+                                    label="Loại ảnh giám định/so sánh" placeholder="--- Chọn loại ảnh ---"
+                                    :items="typeAppraisalOrCompareSelect" clear-icon="tabler-x" clearable />
+                            </VCol>
+                            <VCol cols="12" offset-sm="1" sm="2">
+                                <VBtn class="mt-6" @click="searchNormal">
+                                    <VIcon start icon="tabler-search" />Tìm kiếm
+                                </VBtn>
+                            </VCol>
+                        </VRow>
+                        <VRow v-if="item === 2">
+                            <VCol cols="12" sm="4">
+                                <label class="v-label mb-1 text-body-2">Tìm kiếm hình ảnh</label>
+                                <VFileInput label="Chọn ảnh tra cứu" accept="image/png, image/jpeg, image/bmp"
+                                    prepend-icon="tabler-camera" @input="getValueImageSearch"
+                                    @click:clear="handleRemoveFileSearch()" />
+                            </VCol>
+                            <VCol cols="12" sm="4">
+                                <AppTextField v-model="formSearchImage.main_threshold" label="Tỉ lệ so khớp"
+                                    type="number" placeholder="Tỉ lệ so khớp" />
+                            </VCol>
+                            <VCol cols="12" offset-sm="1" sm="2">
+                                <VBtn class="mt-6" @click="searchImage">
+                                    <VIcon start icon=" tabler-search" />Tìm kiếm
+                                </VBtn>
+                            </VCol>
+                        </VRow>
+                    </VWindowItem>
+                </VWindow>
+            </VCardText>
+        </VCard>
 
         <VDivider />
 
         <div class="d-flex flex-wrap gap-4 ma-6">
             <div class="d-flex gap-4 flex-wrap align-center">
-                <AppSelect v-model="itemsPerPage" :items="[5, 10, 20, 25, 50]" />
+                <AppSelect v-model="itemsPerPage" :items="[5, 10, 20, 25, 50]"
+                    @update:modelValue="handleSelectPageSize" />
             </div>
         </div>
 
         <VDivider class="mt-4" />
 
         <!-- 👉 Datatable  -->
-        <VDataTableServer v-model:items-per-page="itemsPerPage" v-model:page="page" :headers="headers" :items="listData"
-            :items-length="totalData" class="text-no-wrap">
+        <VDataTableServer v-model:items-per-page="itemsPerPage" v-model:page="page" :headers="headers"
+            :items="formTable.data" :items-length="formTable.totalData" class="text-no-wrap">
             <!-- product  -->
             <template #item.image="{ item }">
                 <VImg :src="getUrlImage(item)" width="70" height="70" />
@@ -373,6 +356,11 @@ const handleSelectSearch = (item: any, level = 0) => {
             <template #item.index="{ item, index }">
                 <div class="d-flex align-center gap-x-4">
                     <span class="text-body-1 text-high-emphasis">{{ index + 1 }}</span>
+                </div>
+            </template>
+            <template #item.typeText="{ item }">
+                <div class="d-flex align-center gap-x-4">
+                    {{ printTypeText(item) }}
                 </div>
             </template>
 
@@ -389,7 +377,8 @@ const handleSelectSearch = (item: any, level = 0) => {
 
             <!-- pagination -->
             <template #bottom>
-                <TablePagination v-model:page="page" :items-per-page="itemsPerPage" :total-items="totalData" />
+                <TablePagination v-model:page="page" :items-per-page="itemsPerPage" :total-items="formTable.totalData"
+                    @update:page="handleSelectPageSize" />
             </template>
         </VDataTableServer>
     </VCard>
