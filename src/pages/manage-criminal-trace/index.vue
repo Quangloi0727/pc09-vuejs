@@ -44,14 +44,12 @@ const urlImage = import.meta.env.VITE_API_BASE_URL_IMAGE;
 const headers = [
     { title: '#', key: 'index', sortable: false },
     { title: 'Ảnh', key: 'image', sortable: false },
+    { title: 'Danh mục', key: 'category', sortable: false },
     { title: 'Thông tin', key: 'info', sortable: false },
     { title: 'Loại', key: 'typeText', sortable: false },
     { title: 'GD/SS', key: 'timeCreatedText', sortable: false },
     { title: 'Actions', key: 'actions', sortable: false },
 ];
-
-const { data: listDataType } = await useApiFetchConfigService<any>(createUrl('/type-image/get-all'));
-const listType = computed(() => listDataType.value.data);
 
 const fetchData = async (searchNormal?: any, searchImage?: any) => {
     let body: any = {
@@ -102,13 +100,14 @@ const handleRemoveFileSearch = () => {
 };
 
 const typeAppraisalOrCompareSelect = [
-    { title: "Ảnh giám định", value: "0" },
-    { title: "Ảnh so sánh", value: "1" },
+    { title: "Ảnh giám định", value: 0 },
+    { title: "Ảnh so sánh", value: 1 },
 ];
 
 // 👉 methods
 const editItem = (item: any) => {
     editedItem.value = { ...item };
+    editedItem.value.timecreated = parseInt(editedItem.value.timecreated);
     editDialog.value = true;
 };
 
@@ -128,6 +127,7 @@ const save = async (id: any) => {
         },
     });
     close();
+    fetchData();
 };
 
 const deleteItem = (item: any) => {
@@ -143,6 +143,7 @@ const deleteItemConfirm = async (id: any) => {
 
     });
     closeDelete();
+    fetchData();
 };
 const getUrlImage = (item: any) => {
     return urlImage + '/' + item.type + '/' + item.img_url;
@@ -198,6 +199,13 @@ const handleSelect = (item: any, level = 0) => {
         }
     }
 };
+const getCategoryName = (item: any) => {
+    if (item.categoryInfo) {
+        return item.categoryInfo.name;
+    } else {
+        return "";
+    }
+};
 </script>
 
 <template>
@@ -212,6 +220,13 @@ const handleSelect = (item: any, level = 0) => {
             <VCardText>
                 <VWindow v-model="currentTab">
                     <VWindowItem v-for="item in 2" :key="item" :value="`item-${item}`">
+                        <VRow v-if="item === 1">
+                            <VCol cols="12" sm="2" offset-lg="10">
+                                <VBtn class="mt-6" @click="searchNormal">
+                                    <VIcon start icon="tabler-search" />Tìm kiếm
+                                </VBtn>
+                            </VCol>
+                        </VRow>
                         <VRow v-if="item === 1">
                             <VCol cols="12" sm="4">
                                 <AppTextField v-model="formSearchNormal.search" label="Thông tin ảnh"
@@ -231,11 +246,6 @@ const handleSelect = (item: any, level = 0) => {
                                 <AppAutocomplete :items="childItems.childrenIds" label="Loại"
                                     placeholder="--- Chọn loại ảnh ---" clear-icon="tabler-x" clearable itemTitle="name"
                                     @update:model-value="item => handleSelect(item, index + 1)" return-object />
-                            </VCol>
-                            <VCol cols="12" sm="2">
-                                <VBtn class="mt-6" @click="searchNormal">
-                                    <VIcon start icon="tabler-search" />Tìm kiếm
-                                </VBtn>
                             </VCol>
                         </VRow>
                         <VRow v-if="item === 2">
@@ -288,6 +298,11 @@ const handleSelect = (item: any, level = 0) => {
                     {{ printTypeText(item) }}
                 </div>
             </template>
+            <template #item.category="{ item }">
+                <div class="d-flex align-center gap-x-4">
+                    {{ getCategoryName(item) }}
+                </div>
+            </template>
 
             <!-- Actions -->
             <template #item.actions="{ item }">
@@ -318,15 +333,6 @@ const handleSelect = (item: any, level = 0) => {
                     <VRow>
                         <VCol cols="12">
                             <AppTextField v-model="editedItem.info" label="Thông tin" placeholder="Nhập..."
-                                :rules="[requiredValidator]" />
-                        </VCol>
-                        <VCol cols="12">
-                            <AppTextField v-model="editedItem.code" label="Thông tin người nhập" placeholder="Nhập..."
-                                :rules="[requiredValidator]" />
-                        </VCol>
-                        <VCol cols="12">
-                            <AppAutocomplete v-model="editedItem.type" label="Loại" placeholder="--- Chọn loại ảnh ---"
-                                :items="listType" clear-icon="tabler-x" clearable itemTitle="name" itemValue="id"
                                 :rules="[requiredValidator]" />
                         </VCol>
                         <VCol cols="12">
