@@ -45,30 +45,47 @@ const onSubmit = async () => {
 
 const { data: listCategory } = await useApiFetchAiService<any>(createUrl('/manage-category/getList'));
 const items: any = computed(() => listCategory.value.data);
-
 const handleSelect = (item: any, level = 0) => {
     if (item) {
         formData.value.type = item._id;
         selectedItems.splice(level);
+
+        // Collect fields from selected parent items
+        let allParentFields: any[] = [];
+        for (let i = 0; i < selectedItems.length; i++) {
+            const parentItem = selectedItems[i];
+            if (parentItem.fields && parentItem.fields.length > 0) {
+                allParentFields = allParentFields.concat(parentItem.fields);
+            }
+        }
+
         if (item && item.childrenIds && item.childrenIds.length > 0) {
             selectedItems.push(item);
         }
         if (item && item.fields && item.fields.length > 0) {
             const filteredItems = item.fields.filter((el: any) => el.name.trim() !== '');
-            formData.value.fields = filteredItems;
+            // Merge fields from current item and fields from parents
+            formData.value.fields = allParentFields.concat(filteredItems);
         } else {
-            formData.value.fields = [];
+            formData.value.fields = allParentFields;
         }
     } else {
+        // Clear fields from the selected level and below
         selectedItems.splice(level);
-        const lastItemSelected = selectedItems[selectedItems.length - 1];
-        if (lastItemSelected) {
-            formData.value.type = lastItemSelected._id;
-        } else {
-            formData.value.type = null;
+        formData.value.type = null;
+
+        // Rebuild formData.value.fields based on the remaining selected items
+        let allFields: any[] = [];
+        for (let i = 0; i < selectedItems.length; i++) {
+            const selectedItem = selectedItems[i];
+            if (selectedItem.fields && selectedItem.fields.length > 0) {
+                allFields = allFields.concat(selectedItem.fields);
+            }
         }
+        formData.value.fields = allFields;
     }
 };
+
 </script>
 
 <template>

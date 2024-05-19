@@ -39,16 +39,14 @@ const formSearchImage = ref<FormImage>({
 });
 
 const urlImage = import.meta.env.VITE_API_BASE_URL_IMAGE;
-
-// Headers
-const headers = [
+let headers = [
     { title: '#', key: 'index', sortable: false },
     { title: 'Ảnh', key: 'image', sortable: false },
     { title: 'Danh mục', key: 'category', sortable: false },
     { title: 'Thông tin', key: 'info', sortable: false },
     { title: 'Loại', key: 'typeText', sortable: false },
     { title: 'GD/SS', key: 'timeCreatedText', sortable: false },
-    { title: 'Actions', key: 'actions', sortable: false },
+    { title: 'Actions', key: 'actions', sortable: false }
 ];
 
 const fetchData = async (searchNormal?: any, searchImage?: any) => {
@@ -70,6 +68,16 @@ const fetchData = async (searchNormal?: any, searchImage?: any) => {
         if (typeSearch == "image") {
             body = { ...body, image, main_threshold, typeSearch };
         }
+        headers = [
+            { title: '#', key: 'index', sortable: false },
+            { title: 'Ảnh', key: 'image', sortable: false },
+            { title: 'Danh mục', key: 'category', sortable: false },
+            { title: 'Thông tin', key: 'info', sortable: false },
+            { title: 'Loại', key: 'typeText', sortable: false },
+            { title: 'GD/SS', key: 'timeCreatedText', sortable: false },
+            { title: 'Độ tương đồng', key: 'similarity', sortable: false },
+            { title: 'Actions', key: 'actions', sortable: false }
+        ];
     }
 
     const { data } = await $fetchApiAiService('/sample/search', {
@@ -206,6 +214,9 @@ const getCategoryName = (item: any) => {
         return "";
     }
 };
+const getSimilarityName = (item: any) => {
+    return item.similarity + "%";
+};
 </script>
 
 <template>
@@ -303,6 +314,12 @@ const getCategoryName = (item: any) => {
                     {{ getCategoryName(item) }}
                 </div>
             </template>
+            <template #item.similarity="{ item }">
+                <div class="d-flex align-center gap-x-4">
+                    {{ getSimilarityName(item) }}
+                </div>
+            </template>
+
 
             <!-- Actions -->
             <template #item.actions="{ item }">
