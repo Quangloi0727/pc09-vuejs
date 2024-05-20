@@ -61,6 +61,15 @@ const fetchData = async (searchNormal?: any, searchImage?: any) => {
         if (typeSearch == "normal") {
             body = { ...body, search, timeCreated, typeSearch, category };
         }
+        headers = [
+            { title: '#', key: 'index', sortable: false },
+            { title: 'Ảnh', key: 'image', sortable: false },
+            { title: 'Danh mục', key: 'category', sortable: false },
+            { title: 'Thông tin', key: 'info', sortable: false },
+            { title: 'Loại', key: 'typeText', sortable: false },
+            { title: 'GD/SS', key: 'timeCreatedText', sortable: false },
+            { title: 'Actions', key: 'actions', sortable: false }
+        ];
     }
 
     if (searchImage) {
@@ -170,7 +179,12 @@ const searchNormal = () => {
     fetchData(formSearchNormal);
 };
 const searchImage = () => {
-    fetchData(undefined, formSearchImage);
+    if (formSearchImage.value.image == "") {
+        return alert("Vui lòng chọn hình ảnh tìm kiếm !");
+    } else {
+        fetchData(undefined, formSearchImage);
+    }
+
 };
 const handleSelectPageSize = () => {
     if (currentTab.value == '0') {

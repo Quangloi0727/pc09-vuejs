@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { VForm } from 'vuetify/lib/components/index.mjs';
+
 // Data table options
 const formData: any = ref({
     info: '',
@@ -7,6 +9,7 @@ const formData: any = ref({
     fields: [],
     timecreated: null
 });
+const refForm = ref<VForm>();
 const sourceImage = ref("");
 let selectedItems: any = reactive([]);
 
@@ -41,6 +44,8 @@ const onSubmit = async () => {
         method: 'POST',
         body: formData.value,
     });
+    alert("Thêm thành công !");
+    refForm.value?.reset();
 };
 
 const { data: listCategory } = await useApiFetchAiService<any>(createUrl('/manage-category/getList'));
@@ -93,7 +98,7 @@ const handleSelect = (item: any, level = 0) => {
         <VCardText>
             <VRow>
                 <VCol md="7" cols="12" class="mx-auto">
-                    <VForm @submit.prevent="onSubmit">
+                    <VForm @submit.prevent="onSubmit" ref="refForm">
                         <h5 class="text-h6 mb-6">
                             Thêm ảnh tra cứu
                         </h5>
