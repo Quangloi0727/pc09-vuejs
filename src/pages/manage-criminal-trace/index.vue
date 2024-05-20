@@ -42,9 +42,9 @@ const urlImage = import.meta.env.VITE_API_BASE_URL_IMAGE;
 let headers = [
     { title: '#', key: 'index', sortable: false },
     { title: 'Ảnh', key: 'image', sortable: false },
-    { title: 'Danh mục', key: 'category', sortable: false },
     { title: 'Thông tin', key: 'info', sortable: false },
-    { title: 'Loại', key: 'typeText', sortable: false },
+    { title: 'Danh mục', key: 'category', sortable: false },
+    { title: 'Chi tiết', key: 'typeText', sortable: false },
     { title: 'GD/SS', key: 'timeCreatedText', sortable: false },
     { title: 'Actions', key: 'actions', sortable: false }
 ];
@@ -64,9 +64,9 @@ const fetchData = async (searchNormal?: any, searchImage?: any) => {
         headers = [
             { title: '#', key: 'index', sortable: false },
             { title: 'Ảnh', key: 'image', sortable: false },
-            { title: 'Danh mục', key: 'category', sortable: false },
             { title: 'Thông tin', key: 'info', sortable: false },
-            { title: 'Loại', key: 'typeText', sortable: false },
+            { title: 'Danh mục', key: 'category', sortable: false },
+            { title: 'Chi tiết', key: 'typeText', sortable: false },
             { title: 'GD/SS', key: 'timeCreatedText', sortable: false },
             { title: 'Actions', key: 'actions', sortable: false }
         ];
@@ -80,9 +80,9 @@ const fetchData = async (searchNormal?: any, searchImage?: any) => {
         headers = [
             { title: '#', key: 'index', sortable: false },
             { title: 'Ảnh', key: 'image', sortable: false },
-            { title: 'Danh mục', key: 'category', sortable: false },
             { title: 'Thông tin', key: 'info', sortable: false },
-            { title: 'Loại', key: 'typeText', sortable: false },
+            { title: 'Danh mục', key: 'category', sortable: false },
+            { title: 'Chi tiết', key: 'typeText', sortable: false },
             { title: 'GD/SS', key: 'timeCreatedText', sortable: false },
             { title: 'Độ tương đồng', key: 'similarity', sortable: false },
             { title: 'Actions', key: 'actions', sortable: false }
@@ -141,10 +141,11 @@ const save = async (id: any) => {
             info: editedItem.value.info,
             type: editedItem.value.type,
             timeCreated: editedItem.value.timecreated,
+            fields: editedItem.value.fields,
         },
     });
     close();
-    fetchData();
+    handleSelectPageSize();
 };
 
 const deleteItem = (item: any) => {
@@ -160,7 +161,7 @@ const deleteItemConfirm = async (id: any) => {
 
     });
     closeDelete();
-    fetchData();
+    handleSelectPageSize();
 };
 const getUrlImage = (item: any) => {
     return urlImage + '/' + item.type + '/' + item.img_url;
@@ -371,6 +372,11 @@ const getSimilarityName = (item: any) => {
                                 placeholder="--- Chọn loại ảnh ---" :items="typeAppraisalOrCompareSelect"
                                 clear-icon="tabler-x" clearable :rules="[requiredValidator]" />
                         </VCol>
+                        <VCol cols="12" md="6" v-for="(field, index) in editedItem.fields" :key="index"
+                            v-if="editedItem.fields.length > 0">
+                            <AppTextField v-model="field.value" :label="field.name" placeholder="Nhập..."
+                                :rules="[requiredValidator]" />
+                        </VCol>
                     </VRow>
                 </VContainer>
             </VCardText>
@@ -382,7 +388,7 @@ const getSimilarityName = (item: any) => {
                     Đóng
                 </VBtn>
 
-                <VBtn color="success" variant="elevated" @click="save(editedItem._id)">
+                <VBtn color="success" variant="elevated" @click="save(editedItem._id || editedItem.id)">
                     Lưu
                 </VBtn>
             </VCardActions>
@@ -402,7 +408,7 @@ const getSimilarityName = (item: any) => {
                     Hủy
                 </VBtn>
 
-                <VBtn color="success" variant="elevated" @click="deleteItemConfirm(editedItem._id)">
+                <VBtn color="success" variant="elevated" @click="deleteItemConfirm(editedItem._id || editedItem.id)">
                     Xác nhận
                 </VBtn>
 

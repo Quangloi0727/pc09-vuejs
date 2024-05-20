@@ -13,9 +13,9 @@ export const redirects: RouteRecordRaw[] = [
       const userRole = userData.value?.role;
 
       if (userRole === 'admin')
-        return { name: 'dashboards-crm' };
+        return { name: 'manage-sample-separation-list' };
       if (userRole === 'client')
-        return { name: 'access-control' };
+        return { name: 'manage-sample-separation-list' };
 
       return { name: 'login', query: to.query };
     },
