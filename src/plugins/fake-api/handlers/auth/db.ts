@@ -1,8 +1,8 @@
-import type { User } from '@db/auth/types'
+import type { User } from '@db/auth/types';
 
 interface DB {
-  userTokens: string[]
-  users: User[]
+  userTokens: string[];
+  users: User[];
 }
 export const db: DB = {
   // TODO: Use jsonwebtoken pkg
@@ -28,7 +28,7 @@ export const db: DB = {
       username: 'johndoe',
       password: 'admin',
 
-      avatar: `${import.meta.env.BASE_URL ?? '/'}images/avatars/avatar-1.png`,
+      avatar: `${import.meta.env.BASE_URL ?? '/'}images/avatars/avatar-default.png`,
       email: 'admin@demo.com',
       role: 'admin',
       abilityRules: [
@@ -55,4 +55,4 @@ export const db: DB = {
       ],
     },
   ],
-}
+};

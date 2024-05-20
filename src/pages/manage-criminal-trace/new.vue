@@ -9,7 +9,6 @@ const formData: any = ref({
     fields: [],
     timecreated: null
 });
-const refForm = ref<VForm>();
 const sourceImage = ref("");
 let selectedItems: any = reactive([]);
 
@@ -45,7 +44,14 @@ const onSubmit = async () => {
         body: formData.value,
     });
     alert("Thêm thành công !");
-    refForm.value?.reset();
+    resetForm();
+};
+
+const resetForm = () => {
+    formData.value.image = "";
+    formData.value.info = "";
+    formData.value.timecreated = null;
+    sourceImage.value = "";
 };
 
 const { data: listCategory } = await useApiFetchAiService<any>(createUrl('/manage-category/getList'));
@@ -60,7 +66,8 @@ const handleSelect = (item: any, level = 0) => {
         for (let i = 0; i < selectedItems.length; i++) {
             const parentItem = selectedItems[i];
             if (parentItem.fields && parentItem.fields.length > 0) {
-                allParentFields = allParentFields.concat(parentItem.fields);
+                const filtered = parentItem.fields.filter((el: any) => el.name !== "");
+                allParentFields = allParentFields.concat(filtered);
             }
         }
 
@@ -98,7 +105,7 @@ const handleSelect = (item: any, level = 0) => {
         <VCardText>
             <VRow>
                 <VCol md="7" cols="12" class="mx-auto">
-                    <VForm @submit.prevent="onSubmit" ref="refForm">
+                    <VForm @submit.prevent="onSubmit">
                         <h5 class="text-h6 mb-6">
                             Thêm ảnh tra cứu
                         </h5>
