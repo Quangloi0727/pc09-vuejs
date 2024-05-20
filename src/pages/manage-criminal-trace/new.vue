@@ -7,7 +7,8 @@ const formData: any = ref({
     code: 'Default',
     type: null,
     fields: [],
-    timecreated: null
+    timecreated: null,
+    keyInput: 0
 });
 const sourceImage = ref("");
 let selectedItems: any = reactive([]);
@@ -51,7 +52,11 @@ const resetForm = () => {
     formData.value.image = "";
     formData.value.info = "";
     formData.value.timecreated = null;
+    formData.value.keyInput += 1;
     sourceImage.value = "";
+    formData.value.fields.forEach((field: any) => {
+        field.value = '';
+    });
 };
 
 const { data: listCategory } = await useApiFetchAiService<any>(createUrl('/manage-category/getList'));
@@ -112,8 +117,8 @@ const handleSelect = (item: any, level = 0) => {
                         <VRow>
                             <VCol cols="12" md="12">
                                 <VFileInput label="Chọn ảnh tra cứu" accept="image/png, image/jpeg, image/bmp"
-                                    prepend-icon="tabler-camera" @input="showImage" @click:clear="handleRemoveFile()"
-                                    :rules="[requiredValidator]" />
+                                    :key="formData.keyInput" prepend-icon="tabler-camera" @input="showImage"
+                                    @click:clear="handleRemoveFile()" :rules="[requiredValidator]" />
                             </VCol>
 
                             <VCol cols="12" md="12">
