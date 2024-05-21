@@ -40,12 +40,20 @@ const onSubmit = async () => {
         const imageBinary = sourceImage.value.split(',');
         formData.value.image = imageBinary[1];
     }
-    await $fetchApiAiService('/sample/import', {
-        method: 'POST',
-        body: formData.value,
-    });
-    alert("Thêm thành công !");
-    resetForm();
+    try {
+        const response = await $fetchApiAiService('/sample/import', {
+            method: 'POST',
+            body: formData.value,
+        });
+        if (response.error == false) {
+            toast.success('Thêm mới thành công !');
+            resetForm();
+        } else {
+            toast.error('Thêm mới thất bại !');
+        }
+    } catch (error) {
+        toast.error('Thêm mới thất bại !');
+    }
 };
 
 const resetForm = () => {

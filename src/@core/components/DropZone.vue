@@ -13,7 +13,7 @@ const acceptType = ['text/c', 'applic'];
 function onDrop(DroppedFiles: File[] | null) {
   DroppedFiles?.forEach(file => {
     if (!acceptType.includes(file.type.slice(0, 6))) {
-      alert('Chỉ chấp nhận file xlsv,csv');
+      toast.error('Chỉ chấp nhận file xlsv,csv !');
       return;
     }
     fileData.value.push({
