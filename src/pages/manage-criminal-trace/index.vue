@@ -166,16 +166,6 @@ const deleteItemConfirm = async (id: any) => {
 const getUrlImage = (item: any) => {
     return urlImage + '/' + item.type + '/' + item.img_url;
 };
-
-const printTypeText = (item: any) => {
-    if (item && item.fields && item.fields.length) {
-        const valuesArray = item.fields.map((el: any) => el.value);
-        const result = valuesArray.join(',');
-        return result;
-    } else {
-        return '';
-    }
-};
 const searchNormal = () => {
     fetchData(formSearchNormal);
 };
@@ -231,6 +221,17 @@ const getCategoryName = (item: any) => {
 };
 const getSimilarityName = (item: any) => {
     return item.similarity + "%";
+};
+const generateInfoDetail = (item: any) => {
+    let string = "";
+    if (item && item.fields && item.fields.length > 0) {
+        item.fields.forEach((field: any, index: number) => {
+            string += `<li :key="${index}">
+                            ${field.name}: ${field.value}
+                        </li>`;
+        });
+    }
+    return string;
 };
 </script>
 
@@ -321,7 +322,7 @@ const getSimilarityName = (item: any) => {
             </template>
             <template #item.typeText="{ item }">
                 <div class="d-flex align-center gap-x-4">
-                    {{ printTypeText(item) }}
+                    <ul v-html="generateInfoDetail(item)"></ul>
                 </div>
             </template>
             <template #item.category="{ item }">

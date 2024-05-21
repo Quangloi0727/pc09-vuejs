@@ -56,7 +56,7 @@ const login = async () => {
     // Redirect to `to` query if exist or redirect to index route
     // ❗ nextTick is required to wait for DOM updates and later redirect
     await nextTick(() => {
-      router.replace('manage-sample-separation/list');
+      router.replace('manage-criminal-trace');
     });
   }
   catch (err) {
@@ -127,10 +127,6 @@ const onSubmit = () => {
                 <VBtn block type="submit">
                   Login
                 </VBtn>
-              </VCol>
-              <!-- auth providers -->
-              <VCol cols="12" class="text-center">
-                <AuthProvider />
               </VCol>
             </VRow>
           </VForm>
