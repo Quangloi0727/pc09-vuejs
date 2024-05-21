@@ -156,12 +156,22 @@ const closeDelete = () => {
     deleteDialog.value = false;
 };
 const deleteItemConfirm = async (id: any) => {
-    await $fetchApiAiService(`/sample/delete/${id}`, {
-        method: 'PUT',
-
-    });
-    closeDelete();
-    handleSelectPageSize();
+    try {
+        const response = await await $fetchApiAiService(`/sample/delete/${id}`, {
+            method: 'PUT',
+        });
+        if (response.error == false) {
+            toast.success('Xóa thành công !');
+            closeDelete();
+            handleSelectPageSize();
+        } else {
+            closeDelete();
+            toast.error('Xóa thất bại !');
+        }
+    } catch (error: any) {
+        closeDelete();
+        toast.error(error.message);
+    }
 };
 const getUrlImage = (item: any) => {
     return urlImage + '/' + item.type + '/' + item.img_url;
@@ -171,7 +181,7 @@ const searchNormal = () => {
 };
 const searchImage = () => {
     if (formSearchImage.value.image == "") {
-        return alert("Vui lòng chọn hình ảnh tìm kiếm !");
+        return toast.error('Vui lòng chọn hình ảnh tìm kiếm !');
     } else {
         fetchData(undefined, formSearchImage);
     }

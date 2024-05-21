@@ -60,7 +60,11 @@ export default defineConfig({
 
     // Docs: https://github.com/antfu/unplugin-auto-import#unplugin-auto-import
     AutoImport({
-      imports: ['vue', VueRouterAutoImports, '@vueuse/core', '@vueuse/math', 'vue-i18n', 'pinia'],
+      imports: ['vue', VueRouterAutoImports, '@vueuse/core', '@vueuse/math', 'vue-i18n', 'pinia',
+        {
+          'vue3-toastify': ['toast'], // Automatically import 'toast' from 'vue3-toastify'
+        }
+      ],
       dirs: [
         './src/@core/utils',
         './src/@core/composable/',

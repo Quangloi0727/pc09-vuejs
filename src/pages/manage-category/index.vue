@@ -42,15 +42,22 @@ const closeDelete = () => {
     deleteDialog.value = false;
 };
 const deleteItemConfirm = async (_id: any) => {
-    await $fetchApiAiService(`manage-category/${_id}/delete`, {
-        method: 'DELETE',
-    }).catch(err => {
-        alert(err);
+    try {
+        const response = await $fetchApiAiService(`manage-category/${_id}/delete`, {
+            method: 'DELETE',
+        });
+        if (response.error == false) {
+            toast.success('Xóa thành công !');
+            closeDelete();
+            fetchData();
+        } else {
+            closeDelete();
+            toast.error('Xóa thất bại !');
+        }
+    } catch (error: any) {
         closeDelete();
-        return;
-    });
-    closeDelete();
-    fetchData();
+        toast.error(error.message);
+    }
 };
 
 const { data: listData, execute: fetchData } = await useApiFetchAiService<any>(createUrl('/manage-category/getList'));
