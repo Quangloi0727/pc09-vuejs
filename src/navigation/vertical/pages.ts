@@ -16,6 +16,14 @@ export default [
       { title: 'Danh sách', to: 'manage-sample-separation-list' },
     ],
   },
+  {
+    title: 'Phân quyền',
+    icon: { icon: 'tabler-users-group' },
+    children: [
+      { title: 'Danh sách domain', to: 'apps-domain' },
+      { title: 'Danh sách module', to: 'apps-permissions' },
+    ],
+  },
   // {
   //   title: 'Quản lý tàng thư dấu vết hình sự',
   //   icon: { icon: 'tabler-database-search' },

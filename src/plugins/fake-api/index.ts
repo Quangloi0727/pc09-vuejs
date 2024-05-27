@@ -5,6 +5,7 @@ import { handlerAppBarSearch } from '@db/app-bar-search/index'
 import { handlerAppsAcademy } from '@db/apps/academy/index'
 import { handlerAppsCalendar } from '@db/apps/calendar/index'
 import { handlerAppsChat } from '@db/apps/chat/index'
+import { handlerAppsDomain } from '@db/apps/domain/index'
 import { handlerAppsEcommerce } from '@db/apps/ecommerce/index'
 import { handlerAppsEmail } from '@db/apps/email/index'
 import { handlerAppsInvoice } from '@db/apps/invoice/index'
@@ -35,6 +36,7 @@ const worker = setupWorker(
   ...handlerAppLogistics,
   ...handlerAuth,
   ...handlerDashboard,
+  ...handlerAppsDomain
 )
 
 export default function () {
