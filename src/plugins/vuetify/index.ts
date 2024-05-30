@@ -3,6 +3,7 @@ import { deepMerge } from '@antfu/utils';
 import { themeConfig } from '@themeConfig';
 import type { App } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { LoadingPlugin } from 'vue-loading-overlay';
 import Vue3Toastify, { type ToastContainerOptions } from 'vue3-toastify';
 import { createVuetify } from 'vuetify';
 import { VBtn } from 'vuetify/components/VBtn';
@@ -15,6 +16,7 @@ import { staticPrimaryColor, staticPrimaryDarkenColor, themes } from './theme';
 // Styles
 import { cookieRef } from '@/@layouts/stores/config';
 import '@core/scss/template/libs/vuetify/index.scss';
+import 'vue-loading-overlay/dist/css/index.css';
 import 'vue3-toastify/dist/index.css';
 import 'vuetify/styles';
 
@@ -60,4 +62,7 @@ export default function (app: App) {
   app.use(Vue3Toastify, {
     autoClose: 3000,
   } as ToastContainerOptions);
+
+  // import module loading
+  app.use(LoadingPlugin);
 }

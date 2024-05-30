@@ -1,40 +1,14 @@
 export default [
   { heading: 'Danh sách menu' },
   {
-    title: 'Quản lý phòng thí nghiệm',
-    icon: { icon: 'tabler-door' },
-    children: [
-      { title: 'Thiết bị', to: 'apps-quanliphongthinghiem-thietbi' },
-      { title: 'Kho nguyên liệu', to: 'apps-quanliphongthinghiem-khonguyenlieu' },
-      { title: 'Kho nguyên mẫu', to: 'apps-quanliphongthinghiem-khonguyenmau' },
-    ],
-  },
-  {
-    title: 'Quy trình phân tách mẫu',
-    icon: { icon: 'tabler-arrows-split-2' },
-    children: [
-      { title: 'Danh sách', to: 'manage-sample-separation-list' },
-    ],
-  },
-  {
     title: 'Phân quyền',
     icon: { icon: 'tabler-users-group' },
     children: [
-      { title: 'Danh sách domain', to: 'apps-domain' },
-      { title: 'Danh sách module', to: 'apps-permissions' },
+      { title: 'Danh sách người dùng', to: 'manage-user-list' },
+      { title: 'Danh sách domain', to: 'manage-domain-list' },
+      { title: 'Danh sách module', to: 'manage-module-list' },
+      { title: 'Danh sách nhóm', to: 'manage-group-list' },
+      { title: 'Danh sách quyền', to: 'manage-permission-list' },
     ],
-  },
-  // {
-  //   title: 'Quản lý tàng thư dấu vết hình sự',
-  //   icon: { icon: 'tabler-database-search' },
-  //   children: [
-  //     { title: 'Tra cứu dữ liệu', to: 'manage-criminal-trace', icon: { icon: 'tabler-search' } },
-  //     { title: 'Cập nhật dữ liệu', to: 'manage-criminal-trace-new', icon: { icon: 'tabler-edit-circle' } },
-  //   ],
-  // },
-  // {
-  //   title: 'Quản lý danh mục',
-  //   icon: { icon: 'tabler-category' },
-  //   to: 'manage-category',
-  // },
+  }
 ];
