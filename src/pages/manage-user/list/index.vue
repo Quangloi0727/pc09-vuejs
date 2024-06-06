@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import AddNewUserDrawer from '@/views/manage-user/AddNewUserDrawer.vue';
+import EditUserDrawer from '@/views/manage-user/EditUserDrawer.vue';
 // 👉 Store
 const searchQuery = ref('');
 
@@ -31,7 +32,7 @@ const { data: listData, execute: fetchData } = await useApiAuthenticationService
 const list = computed(() => listData.value.data.data);
 const total = computed(() => listData.value.data.total);
 const isAddNewUserDrawerVisible = ref(false);
-const isEditDomainDrawerVisible = ref(false);
+const isEditUserDrawerVisible = ref(false);
 
 // 👉 Add new user
 const addNewUser = async (userData: any) => {
@@ -44,6 +45,25 @@ const addNewUser = async (userData: any) => {
             toast.success('Thêm mới thành công !');
         } else {
             toast.error('Thêm mới thất bại !');
+        }
+    } catch (error: any) {
+        toast.error(error.message);
+    }
+    fetchData();
+};
+
+const editUser = async (data: any) => {
+    try {
+        const { _id, ...dataUpdate } = data;
+        dataUpdate.domain = dataUpdate.domain._id;
+        const response = await $apiAuthenticationService(`manage-user/${data._id}/update`, {
+            method: 'PUT',
+            body: dataUpdate
+        });
+        if (response.error == false) {
+            toast.success('Cập nhật thành công !');
+        } else {
+            toast.error('Cập nhật thất bại !');
         }
     } catch (error: any) {
         toast.error(error.message);
@@ -138,7 +158,7 @@ const printInfoGroup = (item: any) => {
                 <!-- Actions -->
                 <template #item.actions="{ item }">
                     <IconBtn @click="() => {
-                        isEditDomainDrawerVisible = true;
+                        isEditUserDrawerVisible = true;
                         dataEdit = item;
                     }">
                         <VIcon icon="tabler-pencil" />
@@ -162,6 +182,10 @@ const printInfoGroup = (item: any) => {
         </VCard>
         <!-- 👉 Add New User -->
         <AddNewUserDrawer v-model:isDrawerOpen="isAddNewUserDrawerVisible" @user-data="addNewUser" />
+        <!-- 👉 Add New User -->
+        <!-- 👉 Add New User -->
+        <EditUserDrawer v-model:isDrawerOpen="isEditUserDrawerVisible" :data="dataEdit ? dataEdit : {}"
+            @update-user="editUser" />
         <!-- 👉 Add New User -->
         <!-- 👉 Delete Dialog -->
         <VDialog v-model="deleteDialog" max-width="500px">
