@@ -21,6 +21,7 @@ const emit = defineEmits<Emit>();
 const isFormValid = ref(false);
 const refForm = ref<VForm>();
 const name = ref('');
+const path = ref('');
 const _id = ref('');
 
 // 👉 drawer close
@@ -38,6 +39,7 @@ const onSubmit = () => {
         if (valid) {
             emit('updateModule', {
                 name: name.value,
+                path: path.value,
                 _id: _id.value
             });
             emit('update:isDrawerOpen', false);
@@ -55,6 +57,7 @@ const handleDrawerModelValueUpdate = (val: boolean) => {
 
 watch(() => props.data, (dataEdit: any) => {
     name.value = dataEdit?.name;
+    path.value = dataEdit?.path;
     _id.value = dataEdit?._id;
 }, { immediate: true });
 
@@ -77,6 +80,10 @@ watch(() => props.data, (dataEdit: any) => {
                             <VCol cols="12">
                                 <AppTextField v-model="name" :rules="[requiredValidator]" label="Tên module"
                                     placeholder="Nhập tên module..." />
+                            </VCol>
+                            <VCol cols="12">
+                                <AppTextField v-model="path" :rules="[requiredValidator]" label="Tên module"
+                                    placeholder="Nhập đường dẫn..." />
                             </VCol>
                             <!-- 👉 Submit and Cancel -->
                             <VCol cols="12">

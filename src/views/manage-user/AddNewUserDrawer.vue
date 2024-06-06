@@ -4,24 +4,34 @@ import type { VForm } from 'vuetify/components/VForm';
 
 interface Emit {
   (e: 'update:isDrawerOpen', value: boolean): void;
-  (e: 'domainData', value: any): void;
+  (e: 'userData', value: any): void;
 }
 
 interface Props {
   isDrawerOpen: boolean;
 }
 
+interface DataForm {
+  fullname: string;
+  username: string;
+  password: string;
+  domain: any;
+  groups: any[];
+}
+
 const props = defineProps<Props>();
 const emit = defineEmits<Emit>();
 
+const isPasswordVisible = ref(false);
 const isFormValid = ref(false);
 const refForm = ref<VForm>();
-const formData = ref({
+const formData = ref<DataForm>({
   fullname: '',
   username: '',
   password: '',
+  domain: null,
+  groups: []
 });
-const isPasswordVisible = ref(false);
 
 // 👉 drawer close
 const closeNavigationDrawer = () => {
@@ -36,7 +46,8 @@ const closeNavigationDrawer = () => {
 const onSubmit = () => {
   refForm.value?.validate().then(({ valid }) => {
     if (valid) {
-      emit('domainData', formData.value);
+      formData.value.domain = formData.value.domain._id;
+      emit('userData', formData.value);
       emit('update:isDrawerOpen', false);
       nextTick(() => {
         refForm.value?.reset();
@@ -50,17 +61,19 @@ const handleDrawerModelValueUpdate = (val: boolean) => {
   emit('update:isDrawerOpen', val);
 };
 
-const { data: listDomain } = await useApiAuthenticationService<any>(createUrl('/manage-domain/list'));
-const itemsDomain: any = computed(() => listDomain.value.data.data);
+const { data: listDomain } = await useApiAuthenticationService<any>(createUrl('/manage-domain/getAll'));
+const itemsDomain: any = computed(() => listDomain.value.data);
 
-const { data: listModule } = await useApiAuthenticationService<any>(createUrl('/manage-module/list'));
-const itemsModule: any = computed(() => listModule.value.data.data);
+const itemsGroups = ref([]);
 
-const { data: listGroup } = await useApiAuthenticationService<any>(createUrl('/manage-group/list'));
-const itemsGroup: any = computed(() => listGroup.value.data.data);
-
-const { data: listPermission } = await useApiAuthenticationService<any>(createUrl('/manage-permission/list'));
-const itemsPermission: any = computed(() => listPermission.value.data.data);
+const handleSelect = (item: any) => {
+  formData.value.groups = [];
+  if (item && item.groups) {
+    itemsGroups.value = item.groups;
+  } else {
+    formData.value.groups = [];
+  }
+}
 
 </script>
 
@@ -90,23 +103,17 @@ const itemsPermission: any = computed(() => listPermission.value.data.data);
                 <AppTextField label="Password" placeholder="Nhập password" v-model="formData.password"
                   :type="isPasswordVisible ? 'text' : 'password'"
                   :append-inner-icon="isPasswordVisible ? 'tabler-eye-off' : 'tabler-eye'"
-                  @click:append-inner="isPasswordVisible = !isPasswordVisible" />
+                  @click:append-inner="isPasswordVisible = !isPasswordVisible" :rules="[requiredValidator]" />
               </VCol>
               <VCol cols="12">
-                <AppAutocomplete label="Domain" placeholder="--- Chọn domain ---" clear-icon="tabler-x" clearable
-                  itemTitle="name" :rules="[requiredValidator]" :items="itemsDomain" />
+                <AppAutocomplete v-model="formData.domain" label="Domain" placeholder="--- Chọn domain ---"
+                  clear-icon="tabler-x" clearable itemTitle="name" itemValue="_id" :rules="[requiredValidator]"
+                  :items="itemsDomain" @update:model-value="handleSelect" return-object />
               </VCol>
               <VCol cols="12">
-                <AppAutocomplete label="Module" placeholder="--- Chọn module ---" clear-icon="tabler-x" clearable
-                  itemTitle="name" :rules="[requiredValidator]" :items="itemsModule" multiple />
-              </VCol>
-              <VCol cols="12">
-                <AppAutocomplete label="Nhóm" placeholder="--- Chọn nhóm ---" clear-icon="tabler-x" clearable
-                  itemTitle="name" :rules="[requiredValidator]" :items="itemsGroup" multiple />
-              </VCol>
-              <VCol cols="12">
-                <AppAutocomplete label="Quyền" placeholder="--- Chọn quyền ---" clear-icon="tabler-x" clearable
-                  itemTitle="name" :rules="[requiredValidator]" :items="itemsPermission" multiple />
+                <AppAutocomplete v-model="formData.groups" label="Nhóm" placeholder="--- Chọn nhóm ---"
+                  clear-icon="tabler-x" clearable itemTitle="name" itemValue="_id" :rules="[requiredValidator]"
+                  :items="itemsGroups" multiple />
               </VCol>
               <!-- 👉 Submit and Cancel -->
               <VCol cols="12">

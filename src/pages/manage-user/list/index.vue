@@ -1,7 +1,5 @@
 <script setup lang="ts">
 import AddNewUserDrawer from '@/views/manage-user/AddNewUserDrawer.vue';
-import EditUserDrawer from '@/views/manage-user/EditUserDrawer.vue';
-
 // 👉 Store
 const searchQuery = ref('');
 
@@ -14,17 +12,15 @@ const deleteDialog = ref<boolean>(false);
 
 // Headers
 const headers: any[] = [
-    { title: 'Fullname', align: 'center', key: 'fullname', sortable: false, },
-    { title: 'Username', align: 'center', key: 'username', sortable: false, },
-    { title: 'Domain', align: 'center', key: 'domain', sortable: false, },
-    { title: 'Module', align: 'center', key: 'module', sortable: false, },
-    { title: 'Nhóm', align: 'center', key: 'group', sortable: false, },
-    { title: 'Quyền', align: 'center', key: 'permission', sortable: false, },
+    { title: 'Fullname', key: 'fullname', sortable: false, },
+    { title: 'Username', key: 'username', sortable: false, },
+    { title: 'Domain', key: 'domain', sortable: false, },
+    { title: 'Nhóm', key: 'groups', sortable: false, },
     { title: 'Thao tác', align: 'center', key: 'actions', sortable: false, },
 ];
 
 // 👉 Fetching users
-const { data: listData, execute: fetchData } = await useApiAuthenticationService<any>(createUrl('/manage-domain/list', {
+const { data: listData, execute: fetchData } = await useApiAuthenticationService<any>(createUrl('/manage-user/list', {
     query: {
         itemsPerPage,
         page,
@@ -32,17 +28,17 @@ const { data: listData, execute: fetchData } = await useApiAuthenticationService
     },
 }));
 
-const list = computed(() => []);
+const list = computed(() => listData.value.data.data);
 const total = computed(() => listData.value.data.total);
-const isAddNewDomainDrawerVisible = ref(false);
+const isAddNewUserDrawerVisible = ref(false);
 const isEditDomainDrawerVisible = ref(false);
 
 // 👉 Add new user
-const addNewDomain = async (domainData: any) => {
+const addNewUser = async (userData: any) => {
     try {
-        const response = await $apiAuthenticationService(`manage-domain/create`, {
+        const response = await $apiAuthenticationService(`manage-user/create`, {
             method: 'POST',
-            body: domainData
+            body: userData
         });
         if (response.error == false) {
             toast.success('Thêm mới thành công !');
@@ -55,28 +51,10 @@ const addNewDomain = async (domainData: any) => {
     fetchData();
 };
 
-// 👉 Add new user
-const editDomain = async (data: any) => {
-    try {
-        const response = await $apiAuthenticationService(`manage-domain/${data._id}/update`, {
-            method: 'PUT',
-            body: data
-        });
-        if (response.error == false) {
-            toast.success('Chỉnh sửa thành công !');
-        } else {
-            toast.error('Chỉnh sửa thất bại !');
-        }
-    } catch (error: any) {
-        toast.error(error.message);
-    }
-    fetchData();
-};
-
 // 👉 Delete user
 const deleteItemConfirm = async (_id: string) => {
     try {
-        const response = await $apiAuthenticationService(`manage-domain/${_id}/delete`, {
+        const response = await $apiAuthenticationService(`manage-user/${_id}/delete`, {
             method: 'DELETE'
         });
         if (response.error == false) {
@@ -93,6 +71,24 @@ const deleteItemConfirm = async (_id: string) => {
 
 const closeDelete = () => {
     deleteDialog.value = false;
+};
+
+const printInfoDomain = (item: any) => {
+    return item?.domain?.name || "";
+};
+
+const printInfoGroup = (item: any) => {
+    let string = "";
+    if (item && item.groups && item.groups.length > 0) {
+        item.groups.forEach((field: any, index: number) => {
+            if (field.name) {
+                string += `<li :key="${index}">
+                            ${field.name}
+                        </li>`;
+            }
+        });
+    }
+    return string;
 };
 
 </script>
@@ -116,11 +112,11 @@ const closeDelete = () => {
 
                 <div class="app-user-search-filter d-flex align-center flex-wrap gap-4">
                     <!-- 👉 Search  -->
-                    <div style="inline-size: 15.625rem;">
+                    <div style="inline-size: 18.625rem;">
                         <AppTextField v-model="searchQuery" placeholder="Tìm kiếm theo fullname,username ..." />
                     </div>
                     <!-- 👉 Add user button -->
-                    <VBtn prepend-icon="tabler-plus" @click="isAddNewDomainDrawerVisible = true">
+                    <VBtn prepend-icon="tabler-plus" @click="isAddNewUserDrawerVisible = true">
                         Thêm mới
                     </VBtn>
                 </div>
@@ -131,7 +127,14 @@ const closeDelete = () => {
             <!-- SECTION datatable -->
             <VDataTableServer v-model:items-per-page="itemsPerPage" v-model:page="page" :items="list"
                 :items-length="total" :headers="headers" class="text-no-wrap">
-
+                <template #item.domain="{ item }">
+                    {{ printInfoDomain(item) }}
+                </template>
+                <template #item.groups="{ item }">
+                    <div class="d-flex align-center gap-x-4">
+                        <ul v-html="printInfoGroup(item)"></ul>
+                    </div>
+                </template>
                 <!-- Actions -->
                 <template #item.actions="{ item }">
                     <IconBtn @click="() => {
@@ -158,14 +161,13 @@ const closeDelete = () => {
             <!-- SECTION -->
         </VCard>
         <!-- 👉 Add New User -->
-        <AddNewUserDrawer v-model:isDrawerOpen="isAddNewDomainDrawerVisible" @domain-data="addNewDomain" />
-        <EditUserDrawer v-model:isDrawerOpen="isEditDomainDrawerVisible" :data="dataEdit ? dataEdit : {}"
-            @update-domain="editDomain" />
-        <!-- 👉 Delete Dialog  -->
+        <AddNewUserDrawer v-model:isDrawerOpen="isAddNewUserDrawerVisible" @user-data="addNewUser" />
+        <!-- 👉 Add New User -->
+        <!-- 👉 Delete Dialog -->
         <VDialog v-model="deleteDialog" max-width="500px">
             <VCard>
                 <VCardTitle class="d-block font-weight-regular text-wrap">
-                    Bản ghi {{ deleteItem.name }} sẽ được xóa ?
+                    Bản ghi {{ deleteItem.fullname }} sẽ được xóa ?
                 </VCardTitle>
 
                 <VCardActions>

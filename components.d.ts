@@ -378,6 +378,8 @@ declare module 'vue' {
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     ScrollToTop: typeof import('./src/@core/components/ScrollToTop.vue')['default']
+    SetPermissionDialog: typeof import('./src/components/dialogs/SetPermissionDialog.vue')['default']
+    SetRoleDialog: typeof import('./src/components/dialogs/SetRoleDialog.vue')['default']
     ShareProjectDialog: typeof import('./src/components/dialogs/ShareProjectDialog.vue')['default']
     Shortcuts: typeof import('./src/@core/components/Shortcuts.vue')['default']
     TablePagination: typeof import('./src/@core/components/TablePagination.vue')['default']

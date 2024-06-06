@@ -14,7 +14,8 @@ const deleteDialog = ref<boolean>(false);
 
 // Headers
 const headers: any[] = [
-    { title: 'Tên domain', align: 'center', key: 'name', sortable: false, },
+    { title: 'Tên domain', key: 'name', sortable: false, },
+    { title: 'Nhóm', key: 'groups', sortable: false, },
     { title: 'Thao tác', align: 'center', key: 'actions', sortable: false, },
 ];
 
@@ -90,6 +91,20 @@ const closeDelete = () => {
     deleteDialog.value = false;
 };
 
+const printInfoGroup = (item: any) => {
+    let string = "";
+    if (item && item.groups && item.groups.length > 0) {
+        item.groups.forEach((field: any, index: number) => {
+            if (field.name) {
+                string += `<li :key="${index}">
+                            ${field.name}
+                        </li>`;
+            }
+        });
+    }
+    return string;
+};
+
 </script>
 
 <template>
@@ -126,7 +141,11 @@ const closeDelete = () => {
             <!-- SECTION datatable -->
             <VDataTableServer v-model:items-per-page="itemsPerPage" v-model:page="page" :items="list"
                 :items-length="total" :headers="headers" class="text-no-wrap">
-
+                <template #item.groups="{ item }">
+                    <div class="d-flex align-center gap-x-4">
+                        <ul v-html="printInfoGroup(item)"></ul>
+                    </div>
+                </template>
                 <!-- Actions -->
                 <template #item.actions="{ item }">
                     <IconBtn @click="() => {

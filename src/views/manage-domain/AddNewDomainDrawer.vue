@@ -17,6 +17,7 @@ const emit = defineEmits<Emit>();
 const isFormValid = ref(false);
 const refForm = ref<VForm>();
 const name = ref('');
+const groups = ref([]);
 
 // 👉 drawer close
 const closeNavigationDrawer = () => {
@@ -32,7 +33,8 @@ const onSubmit = () => {
   refForm.value?.validate().then(({ valid }) => {
     if (valid) {
       emit('domainData', {
-        name: name.value
+        name: name.value,
+        groups: groups.value,
       });
       emit('update:isDrawerOpen', false);
       nextTick(() => {
@@ -46,6 +48,9 @@ const onSubmit = () => {
 const handleDrawerModelValueUpdate = (val: boolean) => {
   emit('update:isDrawerOpen', val);
 };
+
+const { data: listGroup } = await useApiAuthenticationService<any>(createUrl('/manage-group/getAll'));
+const itemsGroup: any = computed(() => listGroup.value.data);
 
 </script>
 
@@ -66,6 +71,11 @@ const handleDrawerModelValueUpdate = (val: boolean) => {
               <VCol cols="12">
                 <AppTextField v-model="name" :rules="[requiredValidator]" label="Tên domain"
                   placeholder="Nhập tên domain..." />
+              </VCol>
+              <VCol cols="12">
+                <AppAutocomplete v-model="groups" label=" Nhóm" placeholder="--- Chọn nhóm ---" clear-icon="tabler-x"
+                  clearable itemTitle="name" itemValue="_id" :rules="[requiredValidator]" :items="itemsGroup"
+                  multiple />
               </VCol>
               <!-- 👉 Submit and Cancel -->
               <VCol cols="12">

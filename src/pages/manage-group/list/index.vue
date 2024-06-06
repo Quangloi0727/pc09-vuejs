@@ -14,7 +14,9 @@ const deleteDialog = ref<boolean>(false);
 
 // Headers
 const headers: any[] = [
-    { title: 'Tên nhóm', align: 'center', key: 'name', sortable: false, },
+    { title: 'Tên nhóm', key: 'name', sortable: false, },
+    { title: 'Danh sách module', key: 'modules', sortable: false, },
+    { title: 'Danh sách quyền', key: 'permissions', sortable: false, },
     { title: 'Thao tác', align: 'center', key: 'actions', sortable: false, },
 ];
 
@@ -27,10 +29,11 @@ const { data: listData, execute: fetchData } = await useApiAuthenticationService
     },
 }));
 
-const list = computed(() => listData.value.data.data);
+const list: any = computed(() => listData.value.data.data);
 const total = computed(() => listData.value.data.total);
 const isAddNewGroupDrawerVisible = ref(false);
 const isEditGroupDrawerVisible = ref(false);
+const isPermissionDialogVisible = ref(false);
 
 // 👉 Add new user
 const addNewGroup = async (groupData: any) => {
@@ -90,6 +93,51 @@ const closeDelete = () => {
     deleteDialog.value = false;
 };
 
+const setGroupPermissionsModules = async (data: any) => {
+    try {
+        const response = await $apiAuthenticationService(`group-permissions-modules/set`, {
+            method: 'POST',
+            body: data
+        });
+        if (response.error == false) {
+            toast.success('Cập nhật thành công !');
+        } else {
+            toast.error('Cập nhật thất bại !');
+        }
+    } catch (error: any) {
+        toast.error(error.message);
+    }
+    fetchData();
+};
+
+const printInfoPermission = (item: any) => {
+    let string = "";
+    if (item && item.infoDetail && item.infoDetail.permissions && item.infoDetail.permissions.length > 0) {
+        item.infoDetail.permissions.forEach((field: any, index: number) => {
+            if (field.name) {
+                string += `<li :key="${index}">
+                            ${field.name}
+                        </li>`;
+            }
+        });
+    }
+    return string;
+};
+
+const printInfoModule = (item: any) => {
+    let string = "";
+    if (item && item.infoDetail && item.infoDetail.modules && item.infoDetail.modules.length > 0) {
+        item.infoDetail.modules.forEach((field: any, index: number) => {
+            if (field.name) {
+                string += `<li :key="${index}">
+                            ${field.name}
+                        </li>`;
+            }
+        });
+    }
+    return string;
+};
+
 </script>
 
 <template>
@@ -126,20 +174,36 @@ const closeDelete = () => {
             <!-- SECTION datatable -->
             <VDataTableServer v-model:items-per-page="itemsPerPage" v-model:page="page" :items="list"
                 :items-length="total" :headers="headers" class="text-no-wrap">
-
+                <template #item.permissions="{ item }">
+                    <div class="d-flex align-center gap-x-4">
+                        <ul v-html="printInfoPermission(item)"></ul>
+                    </div>
+                </template>
+                <template #item.modules="{ item }">
+                    <div class="d-flex align-center gap-x-4">
+                        <ul v-html="printInfoModule(item)"></ul>
+                    </div>
+                </template>
                 <!-- Actions -->
                 <template #item.actions="{ item }">
                     <IconBtn @click="() => {
+                        isPermissionDialogVisible = true;
+                        dataEdit = item;
+                    }" title="Gán quyền">
+                        <VIcon icon="tabler-tag" />
+                    </IconBtn>
+
+                    <IconBtn @click="() => {
                         isEditGroupDrawerVisible = true;
                         dataEdit = item;
-                    }">
+                    }" title="Chỉnh sửa">
                         <VIcon icon="tabler-pencil" />
                     </IconBtn>
 
                     <IconBtn @click="() => {
                         deleteDialog = true;
                         deleteItem = item;
-                    }">
+                    }" title="Xóa">
                         <VIcon icon="tabler-trash" />
                     </IconBtn>
 
@@ -178,5 +242,8 @@ const closeDelete = () => {
                 </VCardActions>
             </VCard>
         </VDialog>
+
+        <SetPermissionDialog v-model:is-dialog-visible="isPermissionDialogVisible" v-model:data="dataEdit"
+            @update:set-group-permissions-modules="setGroupPermissionsModules" />
     </section>
 </template>

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import _ from 'underscore';
 import { PerfectScrollbar } from 'vue3-perfect-scrollbar';
 import type { VForm } from 'vuetify/components/VForm';
 
@@ -22,6 +23,7 @@ const isFormValid = ref(false);
 const refForm = ref<VForm>();
 const name = ref('');
 const _id = ref('');
+const groups = ref(["66589097029ff8001328854a"]);
 
 // 👉 drawer close
 const closeNavigationDrawer = () => {
@@ -38,6 +40,7 @@ const onSubmit = () => {
         if (valid) {
             emit('updateDomain', {
                 name: name.value,
+                groups: groups.value,
                 _id: _id.value
             });
             emit('update:isDrawerOpen', false);
@@ -54,10 +57,14 @@ const handleDrawerModelValueUpdate = (val: boolean) => {
 };
 
 watch(() => props.data, (dataEdit: any) => {
+    const groupsId = _.pluck(dataEdit?.groups, "_id");
     name.value = dataEdit?.name;
     _id.value = dataEdit?._id;
+    groups.value = groupsId;
 }, { immediate: true });
 
+const { data: listGroup } = await useApiAuthenticationService<any>(createUrl('/manage-group/getAll'));
+const itemsGroup: any = computed(() => listGroup.value.data);
 </script>
 
 <template>
@@ -77,6 +84,11 @@ watch(() => props.data, (dataEdit: any) => {
                             <VCol cols="12">
                                 <AppTextField v-model="name" :rules="[requiredValidator]" label="Tên domain"
                                     placeholder="Nhập tên domain..." />
+                            </VCol>
+                            <VCol cols="12">
+                                <AppAutocomplete v-model="groups" label=" Nhóm" placeholder="--- Chọn nhóm ---"
+                                    clear-icon="tabler-x" clearable itemTitle="name" itemValue="_id"
+                                    :rules="[requiredValidator]" :items="itemsGroup" multiple />
                             </VCol>
                             <!-- 👉 Submit and Cancel -->
                             <VCol cols="12">
