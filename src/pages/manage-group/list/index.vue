@@ -160,7 +160,7 @@ const setGroupPermissionsModules = async (data: any) => {
                                 <td v-if="detailIndex === 0" :rowspan="group.infoDetail.length">
                                     {{ group.name }}
                                 </td>
-                                <td style="padding-inline-start: 0px !important;">
+                                <td style="padding-inline-start: 15px !important;">
                                     {{ detail.moduleId.name }}
                                 </td>
                                 <td>

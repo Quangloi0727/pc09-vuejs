@@ -32,13 +32,14 @@ watch(() => props.data, (data: any) => {
   const { name, _id, infoDetail } = data;
   dataForm.value.groupName = name;
   dataForm.value.groupId = _id;
-
   if (infoDetail && !_.isEmpty(infoDetail)) {
     infoDetail.forEach((el: any) => {
       const { permissions, moduleId } = el;
       const perIds = _.pluck(permissions, "_id");
       dataForm.value.permissions[moduleId._id] = perIds;
     });
+  } else {
+    dataForm.value.permissions = {};
   }
 });
 
@@ -120,7 +121,10 @@ const updatePermissions = (moduleId: any, permissionId: any, event: any) => {
                   <div class="d-flex justify-end">
                     <VCheckbox :label="permission.name" :checked="isChecked(mod._id, permission._id)"
                       @change="updatePermissions(mod._id, permission._id, $event)" :value="permission._id"
+                      v-if="dataForm.permissions && dataForm.permissions[mod._id]"
                       v-model="dataForm.permissions[mod._id]" />
+                    <VCheckbox :label="permission.name" :checked="isChecked(mod._id, permission._id)"
+                      @change="updatePermissions(mod._id, permission._id, $event)" :value="permission._id" v-else />
                   </div>
                 </td>
               </tr>
