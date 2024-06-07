@@ -109,25 +109,6 @@ const setGroupPermissionsModules = async (data: any) => {
     }
     fetchData();
 };
-
-const printInfoPermission = (item: any) => {
-    let string = "";
-    if (item && item.infoDetail && item.infoDetail.permissions && item.infoDetail.permissions.length > 0) {
-        item.infoDetail.permissions.forEach((field: any, index: number) => {
-            if (field.name) {
-                string += `<li :key="${index}">
-                            ${field.name}
-                        </li>`;
-            }
-        });
-    }
-    return string;
-};
-
-const printInfoModule = (item: any) => {
-    return item?.infoDetail?.module?.name || "";
-};
-
 </script>
 
 <template>
@@ -162,41 +143,93 @@ const printInfoModule = (item: any) => {
             <VDivider />
 
             <!-- SECTION datatable -->
-            <VDataTableServer v-model:items-per-page="itemsPerPage" v-model:page="page" :items="list"
-                :items-length="total" :headers="headers" class="text-no-wrap">
-                <template #item.permissions="{ item }">
-                    <div class="d-flex align-center gap-x-4">
-                        <ul v-html="printInfoPermission(item)"></ul>
-                    </div>
-                </template>
-                <template #item.module="{ item }">
-                    {{ printInfoModule(item) }}
-                </template>
-                <!-- Actions -->
-                <template #item.actions="{ item }">
-                    <IconBtn @click="() => {
-                        isPermissionDialogVisible = true;
-                        dataEdit = item;
-                    }" title="Gán quyền">
-                        <VIcon icon="tabler-tag" />
-                    </IconBtn>
+            <VDataTableServer v-model:items-per-page="itemsPerPage" v-model:page="page" :items-length="total"
+                class="text-no-wrap">
+                <thead>
+                    <tr>
+                        <th v-for="header in headers" :key="header.key">
+                            {{ header.title }}
+                        </th>
+                    </tr>
+                </thead>
 
-                    <IconBtn @click="() => {
-                        isEditGroupDrawerVisible = true;
-                        dataEdit = item;
-                    }" title="Chỉnh sửa">
-                        <VIcon icon="tabler-pencil" />
-                    </IconBtn>
+                <tbody>
+                    <template v-for="(group, index) in list" :key="group._id">
+                        <template v-if="group.infoDetail.length > 0">
+                            <tr v-for="(detail, detailIndex) in group.infoDetail" :key="detail._id">
+                                <td v-if="detailIndex === 0" :rowspan="group.infoDetail.length">
+                                    {{ group.name }}
+                                </td>
+                                <td style="padding-inline-start: 0px !important;">
+                                    {{ detail.moduleId.name }}
+                                </td>
+                                <td>
+                                    <ul>
+                                        <li v-for="permission in detail.permissions" :key="permission._id">
+                                            {{ permission.name }}
+                                        </li>
+                                    </ul>
+                                </td>
+                                <td v-if="detailIndex === 0" :rowspan="group.infoDetail.length"
+                                    style="padding-inline-start: 0px !important;">
+                                    <IconBtn @click="() => {
+                                        isPermissionDialogVisible = true;
+                                        dataEdit = group;
+                                    }" title="Gán quyền">
+                                        <VIcon icon="tabler-tag" />
+                                    </IconBtn>
 
-                    <IconBtn @click="() => {
-                        deleteDialog = true;
-                        deleteItem = item;
-                    }" title="Xóa">
-                        <VIcon icon="tabler-trash" />
-                    </IconBtn>
+                                    <IconBtn @click="() => {
+                                        isEditGroupDrawerVisible = true;
+                                        dataEdit = group;
+                                    }" title="Chỉnh sửa">
+                                        <VIcon icon="tabler-pencil" />
+                                    </IconBtn>
 
-                </template>
+                                    <IconBtn @click="() => {
+                                        deleteDialog = true;
+                                        deleteItem = group;
+                                    }" title="Xóa">
+                                        <VIcon icon="tabler-trash" />
+                                    </IconBtn>
+                                </td>
+                                <!-- Các cột khác tương tự -->
+                            </tr>
+                        </template>
+                        <template v-else>
+                            <tr>
+                                <td>
+                                    {{ group.name }}
+                                </td>
+                                <td></td>
+                                <td></td>
+                                <td style="padding-inline-start: 0px !important;">
+                                    <IconBtn @click="() => {
+                                        isPermissionDialogVisible = true;
+                                        dataEdit = group;
+                                    }" title="Gán quyền">
+                                        <VIcon icon="tabler-tag" />
+                                    </IconBtn>
 
+                                    <IconBtn @click="() => {
+                                        isEditGroupDrawerVisible = true;
+                                        dataEdit = group;
+                                    }" title="Chỉnh sửa">
+                                        <VIcon icon="tabler-pencil" />
+                                    </IconBtn>
+
+                                    <IconBtn @click="() => {
+                                        deleteDialog = true;
+                                        deleteItem = group;
+                                    }" title="Xóa">
+                                        <VIcon icon="tabler-trash" />
+                                    </IconBtn>
+                                </td>
+
+                            </tr>
+                        </template>
+                    </template>
+                </tbody>
                 <!-- pagination -->
                 <template #bottom>
                     <TablePagination v-model:page="page" :items-per-page="itemsPerPage" :total-items="total" />

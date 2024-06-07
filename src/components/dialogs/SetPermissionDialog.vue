@@ -15,8 +15,7 @@ interface Emit {
 interface DataForm {
   groupName: string;
   groupId: string;
-  permissions: any[];
-  module: any;
+  permissions: any;
 }
 
 const props = defineProps<Props>();
@@ -26,23 +25,20 @@ const refPermissionForm = ref<VForm>();
 const dataForm = ref<DataForm>({
   groupName: "",
   groupId: "",
-  permissions: [],
-  module: null
+  permissions: {},
 });
 
 watch(() => props.data, (data: any) => {
   const { name, _id, infoDetail } = data;
   dataForm.value.groupName = name;
   dataForm.value.groupId = _id;
+
   if (infoDetail && !_.isEmpty(infoDetail)) {
-    const { permissions, module } = infoDetail;
-    if (permissions) {
+    infoDetail.forEach((el: any) => {
+      const { permissions, moduleId } = el;
       const perIds = _.pluck(permissions, "_id");
-      dataForm.value.permissions = perIds;
-    }
-    if (module) {
-      dataForm.value.module = module._id;
-    }
+      dataForm.value.permissions[moduleId._id] = perIds;
+    });
   }
 });
 
@@ -50,16 +46,12 @@ watch(() => props.data, (data: any) => {
 const onSubmit = () => {
   refPermissionForm.value?.validate().then(({ valid }) => {
     if (valid) {
-      if (!dataForm.value.permissions.length) {
-        return toast.error('Vui lòng chọn ít nhất 1 quyền !');
-      } else {
-        emit('update:setGroupPermissionsModules', dataForm.value);
-        emit('update:isDialogVisible', false);
-        nextTick(() => {
-          refPermissionForm.value?.reset();
-          refPermissionForm.value?.resetValidation();
-        });
-      }
+      emit('update:setGroupPermissionsModules', dataForm.value);
+      emit('update:isDialogVisible', false);
+      nextTick(() => {
+        refPermissionForm.value?.reset();
+        refPermissionForm.value?.resetValidation();
+      });
     }
   });
 };
@@ -73,6 +65,27 @@ const itemsPermission: any = computed(() => listPermission.value.data);
 
 const { data: listModule } = await useApiAuthenticationService<any>(createUrl('/manage-module/getAll'));
 const itemsModule: any = computed(() => listModule.value.data);
+
+const isChecked = (moduleId: any, permissionId: any) => {
+  return dataForm.value.permissions[moduleId] && dataForm.value.permissions[moduleId].includes(permissionId);
+};
+
+const updatePermissions = (moduleId: any, permissionId: any, event: any) => {
+  if (!dataForm.value.permissions[moduleId]) {
+    dataForm.value.permissions[moduleId] = [];
+  }
+  if (event.target.checked) {
+    if (!dataForm.value.permissions[moduleId].includes(permissionId)) {
+      dataForm.value.permissions[moduleId].push(permissionId);
+    }
+  } else {
+    const index = dataForm.value.permissions[moduleId].indexOf(permissionId);
+    if (index > -1) {
+      dataForm.value.permissions[moduleId].splice(index, 1);
+    }
+  }
+}
+
 
 </script>
 
@@ -95,22 +108,19 @@ const itemsModule: any = computed(() => listModule.value.data);
         <!-- 👉 Form -->
         <VForm ref="refPermissionForm">
           <VCol cols="12" md="12">
-            <AppAutocomplete v-model="dataForm.module" label="Chọn module" placeholder="--- Chọn module ---"
-              clear-icon="tabler-x" clearable :items="itemsModule" :rules="[requiredValidator]" itemTitle="name"
-              itemValue="_id" />
-          </VCol>
-          <VCol cols="12" md="12">
             <VTable class="permission-table text-no-wrap mb-6">
               <!-- 👉 Other permission loop -->
-              <tr>
+              <tr v-for="mod in itemsModule" :key="mod._id">
                 <td>
                   <h6 class="text-h6">
-                    Chọn quyền
+                    {{ mod.name }}
                   </h6>
                 </td>
                 <td v-for="permission in itemsPermission" :key="permission._id">
                   <div class="d-flex justify-end">
-                    <VCheckbox :label="permission.name" v-model="dataForm.permissions" :value="permission._id" />
+                    <VCheckbox :label="permission.name" :checked="isChecked(mod._id, permission._id)"
+                      @change="updatePermissions(mod._id, permission._id, $event)" :value="permission._id"
+                      v-model="dataForm.permissions[mod._id]" />
                   </div>
                 </td>
               </tr>
