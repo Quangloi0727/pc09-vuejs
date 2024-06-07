@@ -15,7 +15,7 @@ const deleteDialog = ref<boolean>(false);
 // Headers
 const headers: any[] = [
     { title: 'Tên nhóm', key: 'name', sortable: false, },
-    { title: 'Danh sách module', key: 'modules', sortable: false, },
+    { title: 'Danh sách module', key: 'module', sortable: false, },
     { title: 'Danh sách quyền', key: 'permissions', sortable: false, },
     { title: 'Thao tác', align: 'center', key: 'actions', sortable: false, },
 ];
@@ -125,17 +125,7 @@ const printInfoPermission = (item: any) => {
 };
 
 const printInfoModule = (item: any) => {
-    let string = "";
-    if (item && item.infoDetail && item.infoDetail.modules && item.infoDetail.modules.length > 0) {
-        item.infoDetail.modules.forEach((field: any, index: number) => {
-            if (field.name) {
-                string += `<li :key="${index}">
-                            ${field.name}
-                        </li>`;
-            }
-        });
-    }
-    return string;
+    return item?.infoDetail?.module?.name || "";
 };
 
 </script>
@@ -179,10 +169,8 @@ const printInfoModule = (item: any) => {
                         <ul v-html="printInfoPermission(item)"></ul>
                     </div>
                 </template>
-                <template #item.modules="{ item }">
-                    <div class="d-flex align-center gap-x-4">
-                        <ul v-html="printInfoModule(item)"></ul>
-                    </div>
+                <template #item.module="{ item }">
+                    {{ printInfoModule(item) }}
                 </template>
                 <!-- Actions -->
                 <template #item.actions="{ item }">

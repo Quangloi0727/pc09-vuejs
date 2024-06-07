@@ -16,7 +16,7 @@ interface DataForm {
   groupName: string;
   groupId: string;
   permissions: any[];
-  modules: any[];
+  module: any;
 }
 
 const props = defineProps<Props>();
@@ -27,21 +27,22 @@ const dataForm = ref<DataForm>({
   groupName: "",
   groupId: "",
   permissions: [],
-  modules: []
+  module: null
 });
 
 watch(() => props.data, (data: any) => {
   const { name, _id, infoDetail } = data;
-  const { permissions, modules } = infoDetail;
   dataForm.value.groupName = name;
   dataForm.value.groupId = _id;
-  if (permissions) {
-    const perIds = _.pluck(permissions, "_id");
-    dataForm.value.permissions = perIds;
-  }
-  if (modules) {
-    const modIds = _.pluck(modules, "_id");
-    dataForm.value.modules = modIds;
+  if (infoDetail && !_.isEmpty(infoDetail)) {
+    const { permissions, module } = infoDetail;
+    if (permissions) {
+      const perIds = _.pluck(permissions, "_id");
+      dataForm.value.permissions = perIds;
+    }
+    if (module) {
+      dataForm.value.module = module._id;
+    }
   }
 });
 
@@ -49,12 +50,16 @@ watch(() => props.data, (data: any) => {
 const onSubmit = () => {
   refPermissionForm.value?.validate().then(({ valid }) => {
     if (valid) {
-      emit('update:setGroupPermissionsModules', dataForm.value);
-      emit('update:isDialogVisible', false);
-      nextTick(() => {
-        refPermissionForm.value?.reset();
-        refPermissionForm.value?.resetValidation();
-      });
+      if (!dataForm.value.permissions.length) {
+        return toast.error('Vui lòng chọn ít nhất 1 quyền !');
+      } else {
+        emit('update:setGroupPermissionsModules', dataForm.value);
+        emit('update:isDialogVisible', false);
+        nextTick(() => {
+          refPermissionForm.value?.reset();
+          refPermissionForm.value?.resetValidation();
+        });
+      }
     }
   });
 };
@@ -72,7 +77,7 @@ const itemsModule: any = computed(() => listModule.value.data);
 </script>
 
 <template>
-  <VDialog :width="$vuetify.display.smAndDown ? 'auto' : 600" :model-value="props.isDialogVisible"
+  <VDialog :width="$vuetify.display.smAndDown ? 'auto' : 800" :model-value="props.isDialogVisible"
     @update:model-value="onClose">
     <!-- 👉 Dialog close btn -->
     <DialogCloseBtn @click="onClose" />
@@ -90,14 +95,26 @@ const itemsModule: any = computed(() => listModule.value.data);
         <!-- 👉 Form -->
         <VForm ref="refPermissionForm">
           <VCol cols="12" md="12">
-            <AppAutocomplete v-model="dataForm.modules" label="Chọn module" placeholder="--- Chọn module ---"
+            <AppAutocomplete v-model="dataForm.module" label="Chọn module" placeholder="--- Chọn module ---"
               clear-icon="tabler-x" clearable :items="itemsModule" :rules="[requiredValidator]" itemTitle="name"
-              itemValue="_id" multiple />
+              itemValue="_id" />
           </VCol>
           <VCol cols="12" md="12">
-            <AppAutocomplete v-model="dataForm.permissions" label="Chọn quyền" placeholder="--- Chọn quyền ---"
-              clear-icon="tabler-x" clearable :items="itemsPermission" :rules="[requiredValidator]" itemTitle="name"
-              itemValue="_id" multiple />
+            <VTable class="permission-table text-no-wrap mb-6">
+              <!-- 👉 Other permission loop -->
+              <tr>
+                <td>
+                  <h6 class="text-h6">
+                    Chọn quyền
+                  </h6>
+                </td>
+                <td v-for="permission in itemsPermission" :key="permission._id">
+                  <div class="d-flex justify-end">
+                    <VCheckbox :label="permission.name" v-model="dataForm.permissions" :value="permission._id" />
+                  </div>
+                </td>
+              </tr>
+            </VTable>
           </VCol>
           <!-- 👉 Actions button -->
           <div class=" d-flex align-center justify-center gap-4">
@@ -127,6 +144,10 @@ const itemsModule: any = computed(() => listModule.value.data);
 
     &:not(:first-child) {
       padding-inline: 0.5rem;
+    }
+
+    .v-label {
+      white-space: nowrap;
     }
   }
 }

@@ -82,7 +82,7 @@ watch(() => props.data, (dataEdit: any) => {
                                     placeholder="Nhập tên module..." />
                             </VCol>
                             <VCol cols="12">
-                                <AppTextField v-model="path" :rules="[requiredValidator]" label="Tên module"
+                                <AppTextField v-model="path" :rules="[requiredValidator]" label="Đường dẫn"
                                     placeholder="Nhập đường dẫn..." />
                             </VCol>
                             <!-- 👉 Submit and Cancel -->
