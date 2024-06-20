@@ -20,6 +20,7 @@ interface DataForm {
     _id: string;
     fullname: string;
     username: string;
+    phone: string;
     domain: any;
     groups: any[];
 }
@@ -28,6 +29,7 @@ const formData = ref<DataForm>({
     _id: '',
     fullname: '',
     username: '',
+    phone: '',
     domain: null,
     groups: []
 });
@@ -69,10 +71,11 @@ const handleDrawerModelValueUpdate = (val: boolean) => {
 
 watch(() => props.data, async (dataEdit: any) => {
     if (dataEdit && !_.isEmpty(dataEdit)) {
-        const { fullname, username, domain, groups, _id } = dataEdit;
+        const { fullname, username, domain, groups, _id, phone } = dataEdit;
         formData.value._id = _id;
         formData.value.fullname = fullname;
         formData.value.username = username;
+        formData.value.phone = phone;
         formData.value.domain = domain;
         formData.value.groups = groups;
         const { data } = await useApiAuthenticationService<any>(createUrl(`/manage-domain/${domain._id}/getDetail`));
@@ -116,6 +119,10 @@ const handleSelect = (item: any) => {
                             <VCol cols="12">
                                 <AppTextField v-model="formData.username" :rules="[requiredValidator]" label="Username"
                                     placeholder="Nhập username..." />
+                            </VCol>
+                            <VCol cols="12">
+                                <AppTextField v-model="formData.phone" :rules="[requiredValidator]"
+                                    label="Số điện thoại" placeholder="Nhập số điện thoại..." />
                             </VCol>
                             <VCol cols="12">
                                 <AppAutocomplete v-model="formData.domain" label="Domain"

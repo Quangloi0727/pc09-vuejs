@@ -15,6 +15,7 @@ interface DataForm {
   fullname: string;
   username: string;
   password: string;
+  phone: string;
   domain: any;
   groups: any[];
 }
@@ -29,6 +30,7 @@ const formData = ref<DataForm>({
   fullname: '',
   username: '',
   password: '',
+  phone: '',
   domain: null,
   groups: []
 });
@@ -98,6 +100,10 @@ const handleSelect = (item: any) => {
               <VCol cols="12">
                 <AppTextField v-model="formData.username" :rules="[requiredValidator]" label="Username"
                   placeholder="Nhập username..." />
+              </VCol>
+              <VCol cols="12">
+                <AppTextField v-model="formData.phone" :rules="[requiredValidator]" label="Số điện thoại"
+                  placeholder="Nhập số điện thoại..." />
               </VCol>
               <VCol cols="12">
                 <AppTextField label="Password" placeholder="Nhập password" v-model="formData.password"

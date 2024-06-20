@@ -15,6 +15,7 @@ const deleteDialog = ref<boolean>(false);
 const headers: any[] = [
     { title: 'Fullname', key: 'fullname', sortable: false, },
     { title: 'Username', key: 'username', sortable: false, },
+    { title: 'Số điện thoại', key: 'phone', sortable: false, },
     { title: 'Domain', key: 'domain', sortable: false, },
     { title: 'Nhóm', key: 'groups', sortable: false, },
     { title: 'Thao tác', align: 'center', key: 'actions', sortable: false, },
@@ -97,27 +98,13 @@ const printInfoDomain = (item: any) => {
     return item?.domain?.name || "";
 };
 
-const printInfoGroup = (item: any) => {
-    let string = "";
-    if (item && item.groups && item.groups.length > 0) {
-        item.groups.forEach((field: any, index: number) => {
-            if (field.name) {
-                string += `<li :key="${index}">
-                            ${field.name}
-                        </li>`;
-            }
-        });
-    }
-    return string;
-};
-
 </script>
 
 <template>
     <section>
         <VCard class="mb-6">
             <VCardItem class="pb-4">
-                <VCardTitle>Danh sách domain</VCardTitle>
+                <VCardTitle>Danh sách người dùng</VCardTitle>
             </VCardItem>
             <VCardText class="d-flex flex-wrap gap-4">
                 <div class="me-3 d-flex gap-3">
@@ -151,8 +138,11 @@ const printInfoGroup = (item: any) => {
                     {{ printInfoDomain(item) }}
                 </template>
                 <template #item.groups="{ item }">
-                    <div class="d-flex align-center gap-x-4">
-                        <ul v-html="printInfoGroup(item)"></ul>
+                    <div class="d-flex gap-4">
+                        <VChip v-for="group in item.groups" :key="group" label size="small" class="font-weight-medium"
+                            color="info">
+                            {{ group.name }}
+                        </VChip>
                     </div>
                 </template>
                 <!-- Actions -->

@@ -91,20 +91,6 @@ const closeDelete = () => {
     deleteDialog.value = false;
 };
 
-const printInfoGroup = (item: any) => {
-    let string = "";
-    if (item && item.groups && item.groups.length > 0) {
-        item.groups.forEach((field: any, index: number) => {
-            if (field.name) {
-                string += `<li :key="${index}">
-                            ${field.name}
-                        </li>`;
-            }
-        });
-    }
-    return string;
-};
-
 </script>
 
 <template>
@@ -142,8 +128,11 @@ const printInfoGroup = (item: any) => {
             <VDataTableServer v-model:items-per-page="itemsPerPage" v-model:page="page" :items="list"
                 :items-length="total" :headers="headers" class="text-no-wrap">
                 <template #item.groups="{ item }">
-                    <div class="d-flex align-center gap-x-4">
-                        <ul v-html="printInfoGroup(item)"></ul>
+                    <div class="d-flex gap-4">
+                        <VChip v-for="group in item.groups" :key="group" label size="small" class="font-weight-medium"
+                            color="info">
+                            {{ group.name }}
+                        </VChip>
                     </div>
                 </template>
                 <!-- Actions -->
