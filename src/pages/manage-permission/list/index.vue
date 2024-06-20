@@ -14,8 +14,8 @@ const deleteDialog = ref<boolean>(false);
 
 // Headers
 const headers: any[] = [
-    { title: 'Tên quyền', align: 'center', key: 'name', sortable: false, },
-    { title: 'Thao tác', align: 'center', key: 'actions', sortable: false, },
+    { title: 'Tên quyền', key: 'name', sortable: false },
+    { title: 'Thao tác', align: 'center', key: 'actions', sortable: false },
 ];
 
 // 👉 Fetching users

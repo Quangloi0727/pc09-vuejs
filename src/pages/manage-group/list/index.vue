@@ -109,6 +109,14 @@ const setGroupPermissionsModules = async (data: any) => {
     }
     fetchData();
 };
+
+const colors: any = {
+    'view': { color: 'info' },
+    'create': { color: 'success' },
+    'edit': { color: 'warning' },
+    'delete': { color: 'primary' }
+};
+
 </script>
 
 <template>
@@ -164,11 +172,13 @@ const setGroupPermissionsModules = async (data: any) => {
                                     {{ detail.moduleId.name }}
                                 </td>
                                 <td>
-                                    <ul>
-                                        <li v-for="permission in detail.permissions" :key="permission._id">
+                                    <div class="d-flex gap-4">
+                                        <VChip v-for="permission in detail.permissions" :key="permission" label
+                                            size="small" class="font-weight-medium"
+                                            :color="colors[permission?.name]?.color || 'info'">
                                             {{ permission.name }}
-                                        </li>
-                                    </ul>
+                                        </VChip>
+                                    </div>
                                 </td>
                                 <td v-if="detailIndex === 0" :rowspan="group.infoDetail.length"
                                     style="padding-inline-start: 0px !important;">

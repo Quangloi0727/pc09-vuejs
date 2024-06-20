@@ -14,8 +14,8 @@ const deleteDialog = ref<boolean>(false);
 
 // Headers
 const headers: any[] = [
-    { title: 'Tên module', align: 'center', key: 'name', sortable: false, },
-    { title: 'Đường dẫn', align: 'center', key: 'path', sortable: false, },
+    { title: 'Tên module', key: 'name', sortable: false, },
+    { title: 'Đường dẫn', key: 'path', sortable: false, },
     { title: 'Thao tác', align: 'center', key: 'actions', sortable: false, },
 ];
 
